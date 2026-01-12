@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Number Decoder V2 | IELTS Training</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --error: #ef4444;
+            --error-bg: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --bg: #0c0c1d;
+            --bg-gradient: linear-gradient(135deg, #0c0c1d 0%, #1a1a2e 50%, #16213e 100%);
+            --surface: #1e1e3f;
+            --surface-light: #2a2a5a;
+            --surface-hover: #3a3a6a;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --border: #3f3f7a;
+            --accent-tourist: #22c55e;
+            --accent-expat: #3b82f6;
+            --accent-native: #f59e0b;
+            --accent-spy: #ef4444;
+            --accent-expert: #a855f7;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --glass: rgba(30, 30, 63, 0.8);
+            --glow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        html { height: 100%; height: -webkit-fill-available; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            background: var(--bg-gradient);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary-light); } }
+        @keyframes listening { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.15); opacity: 1; } }
+
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        /* Home Screen */
+        .home-screen {
+            background: var(--bg-gradient);
+            padding: 1.5rem;
+            padding-bottom: calc(1.5rem + var(--safe-bottom));
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .home-header {
+            text-align: center;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .home-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .home-header .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--surface);
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .stat-badge .value { font-weight: 700; color: var(--primary-light); }
+
+        /* Identity Carousel */
+        .identity-carousel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.5s ease-out 0.1s both;
+        }
+
+        .carousel-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .identity-card {
+            flex: 0 0 100%;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .identity-card-inner {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            width: 100%;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .identity-card.active .identity-card-inner {
+            border-color: var(--card-accent, var(--primary));
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .identity-card[data-level="1"] { --card-accent: var(--accent-tourist); }
+        .identity-card[data-level="2"] { --card-accent: var(--accent-expat); }
+        .identity-card[data-level="3"] { --card-accent: var(--accent-native); }
+        .identity-card[data-level="4"] { --card-accent: var(--accent-spy); }
+        .identity-card[data-level="5"] { --card-accent: var(--accent-expert); }
+
+        .identity-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+        .identity-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .identity-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+
+        .identity-tags {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .identity-tag {
+            background: var(--surface-light);
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--surface-light);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background: var(--primary);
+            transform: scale(1.2);
+        }
+
+        /* Mastery Dots */
+        .mastery-section {
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.5s ease-out 0.2s both;
+        }
+
+        .mastery-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .mastery-dots {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 12px;
+        }
+
+        .mastery-dot {
+            aspect-ratio: 1;
+            border-radius: 3px;
+            background: var(--surface-light);
+        }
+
+        .mastery-dot.low { background: #374151; }
+        .mastery-dot.medium { background: #065f46; }
+        .mastery-dot.high { background: #10b981; }
+        .mastery-dot.perfect { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; }
+
+        .start-btn {
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--glow);
+            transition: all 0.2s ease;
+            animation: slideUp 0.5s ease-out 0.3s both;
+        }
+
+        .start-btn:active { transform: scale(0.98); }
+        .start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Training Screen */
+        .training-screen {
+            background: var(--bg-gradient);
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hud-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .hud-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+
+        .hud-stat .value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .hud-stat .label { color: var(--text-dim); }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .icon-btn:active { background: var(--surface-hover); }
+
+        .progress-bar-container {
+            height: 3px;
+            background: var(--surface);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning), var(--error));
+            width: 100%;
+        }
+
+        .control-bar {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--surface);
+        }
+
+        .ctrl-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.7rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .ctrl-btn:active:not(:disabled) { transform: scale(0.97); background: var(--surface-hover); }
+        .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .ctrl-btn.primary { background: var(--primary); border-color: var(--primary); }
+        .ctrl-btn.primary:active:not(:disabled) { background: var(--primary-dark); }
+
+        .display-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+            min-height: 0;
+        }
+
+        .review-badge {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta-tag {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .main-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.05em;
+            min-height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .main-display.listening { color: var(--primary-light); }
+        .main-display.correct { color: var(--success); }
+        .main-display.wrong { color: var(--error); }
+
+        .listening-icon {
+            font-size: 3.5rem;
+            animation: listening 1.5s ease-in-out infinite;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 2.2rem;
+            background: var(--primary);
+            margin-left: 2px;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .feedback {
+            min-height: 2.5rem;
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .feedback-text { font-size: 1rem; font-weight: 600; }
+        .feedback-text.correct { color: var(--success); }
+        .feedback-text.wrong { color: var(--error); }
+        .feedback-answer { font-size: 0.9rem; color: var(--text-muted); }
+
+        .streak-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--warning);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .streak-indicator.active { opacity: 1; }
+
+        .keypad-container {
+            background: var(--surface);
+            padding: 0.75rem;
+            padding-bottom: calc(0.75rem + var(--safe-bottom));
+            border-top: 1px solid var(--border);
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .key {
+            aspect-ratio: 1.5;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-light);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 2px 0 var(--border);
+        }
+
+        .key:active { transform: translateY(2px); box-shadow: none; background: var(--surface-hover); }
+        .key:disabled { opacity: 0.3; cursor: not-allowed; }
+        .key.delete { background: var(--surface-hover); }
+
+        .submit-row {
+            margin-top: 0.5rem;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .submit-row .ctrl-btn { width: 100%; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal-content {
+            background: var(--surface);
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            border-radius: 24px 24px 0 0;
+            padding: 1.5rem;
+            padding-bottom: calc(1.5rem + var(--safe-bottom));
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 { font-size: 1.25rem; margin: 0; }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-light);
+            border: none;
+            border-radius: 50%;
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .speed-control {
+            padding: 1rem;
+            background: var(--surface-light);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .speed-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .speed-value { color: var(--primary-light); font-weight: 600; }
+
+        .speed-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--surface);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .speed-marks {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        .preview-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--surface-light);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+        }
+
+        .toggle-row label { font-size: 0.9rem; }
+
+        .toggle {
+            width: 48px;
+            height: 28px;
+            background: var(--surface);
+            border: none;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: var(--text);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle.active { background: var(--primary); }
+        .toggle.active::after { transform: translateX(20px); }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-stat {
+            background: var(--surface-light);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .summary-stat .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .summary-stat .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .summary-stat.highlight { border: 1px solid var(--success); }
+        .summary-stat.highlight .value { color: var(--success); }
+
+        .mistakes-section { margin-bottom: 1.5rem; }
+        .mistakes-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+
+        .mistake-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: var(--surface-light);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .mistake-item .answer { font-weight: 600; }
+        .mistake-item .type { font-size: 0.8rem; color: var(--text-muted); }
+
+        .summary-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .summary-actions .ctrl-btn { width: 100%; padding: 1rem; }
+
+        .calibration-step { text-align: center; padding: 1rem; }
+        .calibration-step h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .calibration-step p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .calibration-options { display: flex; flex-direction: column; gap: 0.75rem; }
+        .calibration-options .ctrl-btn { padding: 1rem; }
+
+        .recovery-panel {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 0.5rem 1rem;
+        }
+
+        .recovery-panel h4 { color: var(--error); font-size: 0.9rem; margin: 0 0 0.5rem 0; }
+        .recovery-panel p { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 0.75rem 0; }
+        .recovery-actions { display: flex; gap: 0.5rem; }
+        .recovery-actions button { flex: 1; padding: 0.5rem; border-radius: 8px; border: none; font-size: 0.8rem; cursor: pointer; }
+        .recovery-actions .recover { background: var(--error); color: white; }
+        .recovery-actions .dismiss { background: var(--surface-light); color: var(--text); }
+
+        .hidden { display: none !important; }
+
+        @media (max-height: 650px) {
+            .main-display { font-size: 2rem; }
+            .key { min-height: 45px; font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen home-screen">
+        <div class="home-header">
+            <h1>Number Decoder</h1>
+            <p class="subtitle">IELTS Listening Training</p>
+            <div class="stats-row">
+                <div class="stat-badge">
+                    <span>🏆</span>
+                    <span class="value" id="total-score">0</span>
+                </div>
+                <div class="stat-badge">
+                    <span>🔥</span>
+                    <span class="value" id="best-streak">0</span>
+                </div>
+                <div class="stat-badge hidden" id="review-due-badge">
+                    <span>📚</span>
+                    <span class="value" id="review-due-count">0</span>
+                    <span>due</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="identity-carousel">
+            <div class="carousel-container">
+                <div class="carousel-track" id="carousel-track">
+                    <div class="identity-card active" data-level="1">
+                        <div class="identity-card-inner">
+                            <div class="identity-icon">🌴</div>
+                            <div class="identity-name">Tourist</div>
+                            <div class="identity-desc">Slow & Clear</div>
+                            <div class="identity-tags">
+                                <span class="identity-tag">Beginner</span>
+                                <span class="identity-tag">No Time Limit</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="identity-card" data-level="2">
+                        <div class="identity-card-inner">
+                            <div class="identity-icon">🏠</div>
+                            <div class="identity-name">Expat</div>
+                            <div class="identity-desc">Daily Conversations</div>
+                            <div class="identity-tags">
+                                <span class="identity-tag">Standard Speed</span>
+                                <span class="identity-tag">Light Pressure</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="identity-card" data-level="3">
+                        <div class="identity-card-inner">
+                            <div class="identity-icon">🗣️</div>
+                            <div class="identity-name">Native</div>
+                            <div class="identity-desc">Natural Speech</div>
+                            <div class="identity-tags">
+                                <span class="identity-tag">Fast</span>
+                                <span class="identity-tag">Variants</span>
+                                <span class="identity-tag">Fillers</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="identity-card" data-level="4">
+                        <div class="identity-card-inner">
+                            <div class="identity-icon">🕵️</div>
+                            <div class="identity-name">Spy</div>
+                            <div class="identity-desc">Extreme Challenge</div>
+                            <div class="identity-tags">
+                                <span class="identity-tag">Very Fast</span>
+                                <span class="identity-tag">Context</span>
+                                <span class="identity-tag">Time Pressure</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="identity-card" data-level="5">
+                        <div class="identity-card-inner">
+                            <div class="identity-icon">👑</div>
+                            <div class="identity-name">Expert</div>
+                            <div class="identity-desc">Master Level</div>
+                            <div class="identity-tags">
+                                <span class="identity-tag">Extreme</span>
+                                <span class="identity-tag">Mixed</span>
+                                <span class="identity-tag">No Replay</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-nav" id="carousel-nav"></div>
+        </div>
+
+        <div class="mastery-section">
+            <div class="mastery-title">Recent Sessions</div>
+            <div class="mastery-dots" id="mastery-dots"></div>
+        </div>
+
+        <button class="start-btn" id="start-btn">Start Training</button>
+    </div>
+
+    <!-- Training Screen -->
+    <div id="training-screen" class="screen training-screen hidden">
+        <div class="top-bar">
+            <div class="hud-stats">
+                <div class="hud-stat">
+                    <span class="value" id="hud-accuracy">--%</span>
+                    <span class="label">Accuracy</span>
+                </div>
+                <div class="hud-stat">
+                    <span class="value" id="hud-time">--s</span>
+                    <span class="label">Avg Time</span>
+                </div>
+                <div class="hud-stat">
+                    <span class="value" id="hud-replay">--%</span>
+                    <span class="label">Replay</span>
+                </div>
+            </div>
+            <div class="top-bar-actions">
+                <button class="icon-btn" id="speed-btn" title="Speed">⏱️</button>
+                <button class="icon-btn" id="exit-btn" title="Exit">✕</button>
+            </div>
+        </div>
+
+        <div class="progress-bar-container" id="time-bar-container">
+            <div class="progress-bar" id="time-bar"></div>
+        </div>
+
+        <div id="recovery-panel" class="recovery-panel hidden">
+            <h4>⚠️ Fatigue Detected</h4>
+            <p>Your performance is dropping. Consider taking a break.</p>
+            <div class="recovery-actions">
+                <button class="recover" id="recover-btn">Recovery Mode</button>
+                <button class="dismiss" id="dismiss-btn">Continue</button>
+            </div>
+        </div>
+
+        <div class="control-bar">
+            <button class="ctrl-btn primary" id="listen-btn">
+                <span>🔊</span> Listen
+            </button>
+            <button class="ctrl-btn" id="replay-btn" disabled>
+                <span>↺</span> Replay
+            </button>
+            <button class="ctrl-btn" id="next-btn" disabled>
+                <span>→</span> Next
+            </button>
+        </div>
+
+        <div class="display-area">
+            <div id="review-badge" class="review-badge hidden">📚 Review</div>
+            <div id="streak-indicator" class="streak-indicator">
+                <span>🔥</span>
+                <span id="streak-count">0</span>
+            </div>
+            <div class="question-meta">
+                <span class="meta-tag" id="question-type">--</span>
+                <span class="meta-tag" id="question-level">L1</span>
+            </div>
+            <div id="main-display" class="main-display">Press Listen to start</div>
+            <div id="feedback" class="feedback"></div>
+        </div>
+
+        <div class="keypad-container">
+            <div class="keypad" id="keypad">
+                <button class="key" data-val="1">1</button>
+                <button class="key" data-val="2">2</button>
+                <button class="key" data-val="3">3</button>
+                <button class="key" data-val="4">4</button>
+                <button class="key" data-val="5">5</button>
+                <button class="key" data-val="6">6</button>
+                <button class="key" data-val="7">7</button>
+                <button class="key" data-val="8">8</button>
+                <button class="key" data-val="9">9</button>
+                <button class="key" data-val=".">.</button>
+                <button class="key" data-val="0">0</button>
+                <button class="key delete" data-val="del">⌫</button>
+            </div>
+            <div class="submit-row">
+                <button class="ctrl-btn primary" id="submit-btn">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Speed Modal -->
+    <div id="speed-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Speed Settings</h2>
+                <button class="modal-close" id="close-speed-modal">×</button>
+            </div>
+            <div class="speed-control">
+                <div class="speed-label">
+                    <span>Speech Rate</span>
+                    <span class="speed-value" id="speed-display">1.0x</span>
+                </div>
+                <input type="range" class="speed-slider" id="speed-slider" min="0.6" max="1.4" step="0.05" value="1.0">
+                <div class="speed-marks">
+                    <span>Slow</span>
+                    <span>Normal</span>
+                    <span>Fast</span>
+                </div>
+            </div>
+            <button class="preview-btn" id="preview-btn">🔊 Preview Speed</button>
+            <div class="toggle-row">
+                <label>Auto-Flow (Adaptive Speed)</label>
+                <button class="toggle" id="adaptive-toggle"></button>
+            </div>
+            <div class="toggle-row">
+                <label>Recalibrate Device</label>
+                <button class="ctrl-btn" style="flex:0; padding: 0.5rem 1rem;" id="calib-btn">Calibrate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="summary-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Session Complete</h2>
+                <button class="modal-close" id="close-summary-modal">×</button>
+            </div>
+            <div class="summary-stats">
+                <div class="summary-stat highlight">
+                    <div class="value" id="summary-accuracy">85%</div>
+                    <div class="label">Accuracy</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="value" id="summary-streak">12</div>
+                    <div class="label">Best Streak</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="value" id="summary-time">2.8s</div>
+                    <div class="label">Avg Time</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="value" id="summary-count">25</div>
+                    <div class="label">Questions</div>
+                </div>
+            </div>
+            <div class="mistakes-section" id="mistakes-section">
+                <div class="mistakes-title">Mistakes (will be reviewed)</div>
+                <div id="mistakes-list"></div>
+            </div>
+            <div class="summary-actions">
+                <button class="ctrl-btn primary" id="practice-mistakes-btn">📚 Practice Mistakes</button>
+                <button class="ctrl-btn" id="back-home-btn">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calibration Modal -->
+    <div id="calibration-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Speed Calibration</h2>
+                <button class="modal-close" id="close-calib-modal">×</button>
+            </div>
+            <div class="calibration-step">
+                <h3>Listen to both samples</h3>
+                <p>Which one sounds like normal speaking speed to you?</p>
+                <div class="calibration-options">
+                    <button class="ctrl-btn" id="sample-a-btn">🔊 Sample A</button>
+                    <button class="ctrl-btn" id="sample-b-btn">🔊 Sample B</button>
+                </div>
+                <div class="calibration-options" style="margin-top: 1.5rem;">
+                    <button class="ctrl-btn primary" id="select-a-btn">A is Normal</button>
+                    <button class="ctrl-btn primary" id="select-b-btn">B is Normal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ============================================
+    // Configuration
+    // ============================================
+    const DIFFICULTY_CONFIG = {
+        1: { name: 'Tourist', rateBand: { min: 0.65, max: 0.80 }, baseRate: 0.72, chunkPauseMs: 500, fillerProb: 0, contextProb: 0, variantProb: 0, timeLimitSec: null, maxReplays: null, targetTimeMs: 6000 },
+        2: { name: 'Expat', rateBand: { min: 0.78, max: 0.92 }, baseRate: 0.85, chunkPauseMs: 400, fillerProb: 0.1, contextProb: 0, variantProb: 0.1, timeLimitSec: 10, maxReplays: 3, targetTimeMs: 5000 },
+        3: { name: 'Native', rateBand: { min: 0.88, max: 1.02 }, baseRate: 0.95, chunkPauseMs: 300, fillerProb: 0.25, contextProb: 0.15, variantProb: 0.3, timeLimitSec: 8, maxReplays: 2, targetTimeMs: 4000 },
+        4: { name: 'Spy', rateBand: { min: 0.98, max: 1.12 }, baseRate: 1.05, chunkPauseMs: 200, fillerProb: 0.4, contextProb: 0.35, variantProb: 0.5, timeLimitSec: 6, maxReplays: 1, targetTimeMs: 3500 },
+        5: { name: 'Expert', rateBand: { min: 1.08, max: 1.25 }, baseRate: 1.15, chunkPauseMs: 100, fillerProb: 0.5, contextProb: 0.5, variantProb: 0.7, timeLimitSec: 5, maxReplays: 0, targetTimeMs: 3000 }
+    };
+
+    const FILLERS = ["okay, it's ", "so that's ", "let me see... ", "right, ", "um, ", "so ", "actually, "];
+    const CONTEXTS = {
+        phone: ["My number is ", "Call me at "],
+        price: ["That'll be ", "The total is "],
+        year: ["It was in ", "Back in "],
+        percent: ["About ", "Around "]
+    };
+
+    // ============================================
+    // State
+    // ============================================
+    const State = {
+        voiceState: 'LOCKED',
+        currentScreen: 'HOME',
+        isSpeaking: false,
+        speakToken: 0,
+        level: 2,
+        params: null,
+        userRate: 0.95,
+        deviceOffset: 1.0,
+        adaptiveOn: true,
+        adaptiveDelta: 0,
+        effectiveRate: 0.95,
+        reviewRatio: 0.30,
+        session: null,
+        current: null,
+        fatigue: { flag: 'GREEN', dismissed: false },
+        input: ''
+    };
+
+    // ============================================
+    // Storage
+    // ============================================
+    const Storage = {
+        getPrefs() {
+            try {
+                const data = localStorage.getItem('nd2_prefs');
+                return data ? JSON.parse(data) : { level: 2, userRate: 0.95, deviceOffset: 1.0, adaptiveOn: true, calibrated: false, totalScore: 0, bestStreak: 0 };
+            } catch (e) { return { level: 2, userRate: 0.95, deviceOffset: 1.0, adaptiveOn: true, calibrated: false, totalScore: 0, bestStreak: 0 }; }
+        },
+        savePrefs(p) { try { localStorage.setItem('nd2_prefs', JSON.stringify(p)); } catch (e) {} },
+        
+        getSRSItems() {
+            try {
+                const data = localStorage.getItem('nd2_srs');
+                return data ? JSON.parse(data) : { cap: 150, items: [] };
+            } catch (e) { return { cap: 150, items: [] }; }
+        },
+        saveSRSItems(d) { try { localStorage.setItem('nd2_srs', JSON.stringify(d)); } catch (e) {} },
+        
+        getSessions() {
+            try {
+                const data = localStorage.getItem('nd2_sessions');
+                return data ? JSON.parse(data) : { cap: 20, rows: [] };
+            } catch (e) { return { cap: 20, rows: [] }; }
+        },
+        saveSessions(d) { try { localStorage.setItem('nd2_sessions', JSON.stringify(d)); } catch (e) {} },
+        
+        addSession(summary) {
+            const s = this.getSessions();
+            s.rows.unshift(summary);
+            if (s.rows.length > s.cap) s.rows.pop();
+            this.saveSessions(s);
+        }
+    };
+
+    // ============================================
+    // SRS Manager
+    // ============================================
+    const SRS = {
+        gradeAttempt(ok, timeMs, replays, targetTimeMs) {
+            if (!ok) return 1;
+            if (replays === 0 && timeMs <= targetTimeMs) return 5;
+            if (replays > 0 || timeMs > targetTimeMs * 1.5) return 3;
+            return 4;
+        },
+        
+        calculateNextReview(item, q) {
+            item = item || { ease: 2.3, intervalDays: 0, reps: 0, lapses: 0 };
+            if (q <= 2) {
+                item.lapses++;
+                item.reps = 0;
+                item.intervalDays = 0.007;
+                item.ease = Math.max(1.3, item.ease - 0.2);
+            } else {
+                item.reps++;
+                const diff = 5 - q;
+                item.ease = Math.max(1.3, Math.min(2.7, item.ease + (0.1 - diff * (0.08 + diff * 0.02))));
+                if (item.reps === 1) item.intervalDays = 0.007;
+                else if (item.reps === 2) item.intervalDays = 0.04;
+                else item.intervalDays = Math.min(14, item.intervalDays * item.ease);
+            }
+            item.due = Date.now() + item.intervalDays * 86400000;
+            item.lastTs = Date.now();
+            return item;
+        },
+        
+        getDueItems() {
+            const data = Storage.getSRSItems();
+            const now = Date.now();
+            return (data.items || []).filter(it => it.due <= now);
+        },
+        
+        getDueCount() { return this.getDueItems().length; },
+        
+        addOrUpdateItem(question, q) {
+            const data = Storage.getSRSItems();
+            const key = question.type + '_' + question.raw;
+            let item = data.items.find(it => it.key === key);
+            
+            if (item) {
+                this.calculateNextReview(item, q);
+            } else if (q <= 2) {
+                item = { key: key, type: question.type, raw: question.raw, display: question.display, spoken: question.spoken };
+                Object.assign(item, this.calculateNextReview(null, q));
+                data.items.push(item);
+            }
+            
+            if (data.items.length > data.cap) {
+                data.items.sort((a, b) => b.due - a.due);
+                data.items = data.items.slice(0, data.cap);
+            }
+            Storage.saveSRSItems(data);
+        },
+        
+        pickReviewItem() {
+            const due = this.getDueItems();
+            if (due.length === 0) return null;
+            return due[Math.floor(Math.random() * due.length)];
+        }
+    };
+
+    // ============================================
+    // Fatigue Detector
+    // ============================================
+    const FatigueDetector = {
+        check(attempts) {
+            if (attempts.length < 15) return { flag: 'GREEN', reason: '' };
+            const last10 = attempts.slice(-10);
+            const first10 = attempts.slice(0, 10);
+            const accLast = last10.filter(a => a.ok).length / 10;
+            const accFirst = first10.filter(a => a.ok).length / 10;
+            const timeLast = last10.reduce((s, a) => s + a.timeMs, 0) / 10;
+            const timeFirst = first10.reduce((s, a) => s + a.timeMs, 0) / 10;
+            const accDrop = accFirst - accLast;
+            const timeRise = (timeLast - timeFirst) / Math.max(1, timeFirst);
+            if (accDrop >= 0.25 && timeRise >= 0.3) return { flag: 'RED', reason: 'Accuracy dropped' };
+            const last6 = attempts.slice(-6);
+            if (last6.filter(a => !a.ok).length >= 4) return { flag: 'YELLOW', reason: 'Error cluster' };
+            return { flag: 'GREEN', reason: '' };
+        }
+    };
+
+    // ============================================
+    // Phonetic Converter
+    // ============================================
+    const Phonetic = {
+        ones: ['zero','one','two','three','four','five','six','seven','eight','nine'],
+        teens: ['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],
+        tens: ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'],
+        
+        digitToWord(d) { return this.ones[parseInt(d)] || d; },
+        
+        twoDigitToWord(n) {
+            n = parseInt(n);
+            if (n < 10) return this.ones[n];
+            if (n < 20) return this.teens[n - 10];
+            const t = Math.floor(n / 10), o = n % 10;
+            return o === 0 ? this.tens[t] : this.tens[t] + ' ' + this.ones[o];
+        },
+        
+        threeDigitToWord(n) {
+            n = parseInt(n);
+            if (n < 100) return this.twoDigitToWord(n);
+            const h = Math.floor(n / 100), r = n % 100;
+            if (r === 0) return this.ones[h] + ' hundred';
+            return this.ones[h] + ' hundred ' + this.twoDigitToWord(r);
+        },
+        
+        phoneToSpoken(phone, pauseMs) {
+            const pause = pauseMs > 300 ? ', ' : ' ';
+            const a = phone.slice(0,3).split('').map(d => this.digitToWord(d)).join(' ');
+            const e = phone.slice(3,6).split('').map(d => this.digitToWord(d)).join(' ');
+            const s = phone.slice(6).split('').map(d => this.digitToWord(d)).join(' ');
+            return a + pause + e + pause + s;
+        },
+        
+        priceToSpoken(dollars, cents, variantProb) {
+            let spoken = '';
+            if (dollars === 0) {
+                spoken = cents > 0 ? this.twoDigitToWord(cents) + ' cents' : 'zero dollars';
+            } else if (dollars < 100 && Math.random() < variantProb) {
+                spoken = this.twoDigitToWord(dollars);
+                if (cents > 0) spoken += ' ' + this.twoDigitToWord(cents);
+                else spoken += ' dollars';
+            } else {
+                spoken = this.threeDigitToWord(dollars) + ' dollars';
+                if (cents > 0) spoken += ' and ' + this.twoDigitToWord(cents) + ' cents';
+            }
+            return spoken;
+        },
+        
+        yearToSpoken(year, variantProb) {
+            if (year >= 2000 && year <= 2009) return year === 2000 ? 'two thousand' : 'two thousand ' + this.ones[year - 2000];
+            if (year >= 2010 && year <= 2019) return Math.random() < variantProb ? 'two thousand ' + this.twoDigitToWord(year - 2000) : 'twenty ' + this.teens[year - 2010];
+            if (year >= 2020) return 'twenty ' + this.twoDigitToWord(year % 100);
+            const century = Math.floor(year / 100), rest = year % 100;
+            if (rest === 0) return this.twoDigitToWord(century) + ' hundred';
+            if (rest < 10) return this.twoDigitToWord(century) + ' oh ' + this.ones[rest];
+            return this.twoDigitToWord(century) + ' ' + this.twoDigitToWord(rest);
+        },
+        
+        percentToSpoken(value) {
+            const parts = String(value).split('.');
+            const whole = parseInt(parts[0]);
+            const decimal = parts[1];
+            if (decimal && parseInt(decimal) > 0) {
+                return this.twoDigitToWord(whole) + ' point ' + decimal.split('').map(d => this.digitToWord(d)).join(' ') + ' percent';
+            }
+            return this.twoDigitToWord(whole) + ' percent';
+        }
+    };
+
+    // ============================================
+    // Number Factory
+    // ============================================
+    const NumberFactory = {
+        generate(level, type) {
+            const params = DIFFICULTY_CONFIG[level];
+            type = type || ['phone', 'price', 'year', 'percent'][Math.floor(Math.random() * 4)];
+            
+            let q;
+            if (type === 'phone') q = this.genPhone(params);
+            else if (type === 'price') q = this.genPrice(params);
+            else if (type === 'year') q = this.genYear(params);
+            else q = this.genPercent(params);
+            
+            q.type = type;
+            q.level = level;
+            
+            if (Math.random() < params.fillerProb) {
+                q.spoken = FILLERS[Math.floor(Math.random() * FILLERS.length)] + q.spoken;
+            } else if (Math.random() < params.contextProb && CONTEXTS[type]) {
+                const ctx = CONTEXTS[type];
+                q.spoken = ctx[Math.floor(Math.random() * ctx.length)] + q.spoken;
+            }
+            return q;
+        },
+        
+        genPhone(params) {
+            const area = String(Math.floor(Math.random() * 800) + 200).padStart(3, '0');
+            const exch = String(Math.floor(Math.random() * 800) + 200).padStart(3, '0');
+            const sub = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+            const raw = area + exch + sub;
+            return { raw: raw, display: '(' + area + ') ' + exch + '-' + sub, spoken: Phonetic.phoneToSpoken(raw, params.chunkPauseMs) };
+        },
+        
+        genPrice(params) {
+            const dollars = Math.floor(Math.random() * 500);
+            const cents = Math.floor(Math.random() * 100);
+            const raw = dollars + '.' + String(cents).padStart(2, '0');
+            return { raw: raw, display: '$' + raw, spoken: Phonetic.priceToSpoken(dollars, cents, params.variantProb) };
+        },
+        
+        genYear(params) {
+            const year = Math.floor(Math.random() * 130) + 1920;
+            return { raw: String(year), display: String(year), spoken: Phonetic.yearToSpoken(year, params.variantProb) };
+        },
+        
+        genPercent(params) {
+            const hasDecimal = Math.random() > 0.5;
+            const value = hasDecimal ? (Math.random() * 50 + 0.1).toFixed(1) : String(Math.floor(Math.random() * 100));
+            return { raw: value, display: value + '%', spoken: Phonetic.percentToSpoken(value) };
+        }
+    };
+
+    // ============================================
+    // Audio Engine
+    // ============================================
+    const AudioEngine = {
+        synth: window.speechSynthesis,
+        voices: [],
+        selectedVoice: null,
+        
+        loadVoices(timeout) {
+            return new Promise(function(resolve) {
+                const start = Date.now();
+                const self = AudioEngine;
+                const check = function() {
+                    const v = self.synth.getVoices();
+                    if (v && v.length) {
+                        self.voices = v;
+                        self.selectBestVoice();
+                        return resolve(v);
+                    }
+                    if (Date.now() - start < (timeout || 2000)) setTimeout(check, 100);
+                    else resolve([]);
+                };
+                self.synth.onvoiceschanged = check;
+                check();
+            });
+        },
+        
+        selectBestVoice() {
+            const v = this.voices;
+            this.selectedVoice = v.find(function(x) { return x.lang === 'en-US' && x.name.indexOf('Google') >= 0; }) ||
+                v.find(function(x) { return x.lang === 'en-US' && x.name.indexOf('Siri') < 0; }) ||
+                v.find(function(x) { return x.lang === 'en-US'; }) ||
+                v.find(function(x) { return x.lang && x.lang.indexOf('en') === 0; }) ||
+                v[0];
+        },
+        
+        unlock() {
+            const self = this;
+            State.voiceState = 'UNLOCKING';
+            return this.loadVoices(1500).then(function() {
+                return self.speakOnce('ready', { rate: 1.0 });
+            }).then(function(ok) {
+                State.voiceState = ok ? 'READY' : 'ERROR';
+                return ok;
+            });
+        },
+        
+        speakOnce(text, opts) {
+            const self = this;
+            return new Promise(function(resolve) {
+                try {
+                    self.synth.cancel();
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'en-US';
+                    u.rate = ((opts && opts.rate) || 1.0) * State.deviceOffset;
+                    if (self.selectedVoice) u.voice = self.selectedVoice;
+                    
+                    let done = false;
+                    const finish = function(ok) { if (!done) { done = true; resolve(ok); } };
+                    
+                    u.onend = function() { finish(true); };
+                    u.onerror = function() { finish(false); };
+                    setTimeout(function() { finish(false); }, 12000);
+                    
+                    window.__utterance = u;
+                    self.synth.speak(u);
+                } catch (e) { resolve(false); }
+            });
+        },
+        
+        speak(text, rate) {
+            const self = this;
+            if (State.voiceState !== 'READY' || State.isSpeaking) return Promise.resolve(false);
+            
+            State.isSpeaking = true;
+            const token = ++State.speakToken;
+            UI.render();
+            
+            self.synth.cancel();
+            return new Promise(function(r) { setTimeout(r, 50); }).then(function() {
+                return self.speakOnce(text, { rate: rate });
+            }).then(function(ok) {
+                if (token !== State.speakToken) return false;
+                State.isSpeaking = false;
+                if (!ok) State.voiceState = 'ERROR';
+                UI.render();
+                return ok;
+            });
+        }
+    };
+
+    // ============================================
+    // Validator
+    // ============================================
+    const Validator = {
+        normalize(input, type) {
+            let n = input.replace(/[^0-9.]/g, '');
+            if (type === 'price' || type === 'percent') {
+                const num = parseFloat(n);
+                if (!isNaN(num)) n = type === 'price' ? num.toFixed(2) : String(num);
+            }
+            return n;
+        },
+        check(input, answer, type) {
+            const ni = this.normalize(input, type);
+            const na = this.normalize(answer, type);
+            if (type === 'price' || type === 'percent') return parseFloat(ni) === parseFloat(na);
+            return ni === na;
+        }
+    };
+
+    // ============================================
+    // UI Controller
+    // ============================================
+    const UI = {
+        els: {},
+        carouselIndex: 1,
+        
+        init() {
+            this.els = {
+                homeScreen: document.getElementById('home-screen'),
+                trainingScreen: document.getElementById('training-screen'),
+                totalScore: document.getElementById('total-score'),
+                bestStreak: document.getElementById('best-streak'),
+                reviewDueBadge: document.getElementById('review-due-badge'),
+                reviewDueCount: document.getElementById('review-due-count'),
+                carouselTrack: document.getElementById('carousel-track'),
+                carouselNav: document.getElementById('carousel-nav'),
+                masteryDots: document.getElementById('mastery-dots'),
+                startBtn: document.getElementById('start-btn'),
+                hudAccuracy: document.getElementById('hud-accuracy'),
+                hudTime: document.getElementById('hud-time'),
+                hudReplay: document.getElementById('hud-replay'),
+                timeBar: document.getElementById('time-bar'),
+                recoveryPanel: document.getElementById('recovery-panel'),
+                listenBtn: document.getElementById('listen-btn'),
+                replayBtn: document.getElementById('replay-btn'),
+                nextBtn: document.getElementById('next-btn'),
+                submitBtn: document.getElementById('submit-btn'),
+                reviewBadge: document.getElementById('review-badge'),
+                streakIndicator: document.getElementById('streak-indicator'),
+                streakCount: document.getElementById('streak-count'),
+                questionType: document.getElementById('question-type'),
+                questionLevel: document.getElementById('question-level'),
+                mainDisplay: document.getElementById('main-display'),
+                feedback: document.getElementById('feedback'),
+                keypad: document.getElementById('keypad'),
+                speedSlider: document.getElementById('speed-slider'),
+                speedDisplay: document.getElementById('speed-display'),
+                adaptiveToggle: document.getElementById('adaptive-toggle')
+            };
+            
+            this.buildCarouselNav();
+            this.buildMasteryDots();
+            this.updateHome();
+        },
+        
+        buildCarouselNav() {
+            const nav = this.els.carouselNav;
+            nav.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'carousel-dot' + (i === this.carouselIndex - 1 ? ' active' : '');
+                dot.setAttribute('data-index', i + 1);
+                nav.appendChild(dot);
+            }
+        },
+        
+        goToCard(level) {
+            this.carouselIndex = level;
+            State.level = level;
+            State.params = DIFFICULTY_CONFIG[level];
+            
+            this.els.carouselTrack.style.transform = 'translateX(-' + ((level - 1) * 100) + '%)';
+            
+            document.querySelectorAll('.identity-card').forEach(function(c, i) {
+                c.classList.toggle('active', i === level - 1);
+            });
+            
+            document.querySelectorAll('.carousel-dot').forEach(function(d, i) {
+                d.classList.toggle('active', i === level - 1);
+            });
+        },
+        
+        buildMasteryDots() {
+            const container = this.els.masteryDots;
+            container.innerHTML = '';
+            const sessions = Storage.getSessions().rows.slice(0, 20);
+            
+            for (let i = 0; i < 20; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'mastery-dot';
+                if (sessions[i]) {
+                    const acc = sessions[i].accuracy;
+                    if (acc >= 0.95) dot.classList.add('perfect');
+                    else if (acc >= 0.80) dot.classList.add('high');
+                    else if (acc >= 0.60) dot.classList.add('medium');
+                    else dot.classList.add('low');
+                }
+                container.appendChild(dot);
+            }
+        },
+        
+        updateHome() {
+            const prefs = Storage.getPrefs();
+            this.els.totalScore.textContent = prefs.totalScore || 0;
+            this.els.bestStreak.textContent = prefs.bestStreak || 0;
+            
+            const dueCount = SRS.getDueCount();
+            if (dueCount > 0) {
+                this.els.reviewDueBadge.classList.remove('hidden');
+                this.els.reviewDueCount.textContent = dueCount;
+            } else {
+                this.els.reviewDueBadge.classList.add('hidden');
+            }
+            
+            this.buildMasteryDots();
+            this.goToCard(prefs.level || 2);
+        },
+        
+        showScreen(name) {
+            this.els.homeScreen.classList.toggle('hidden', name !== 'HOME');
+            this.els.trainingScreen.classList.toggle('hidden', name !== 'TRAINING');
+            State.currentScreen = name;
+        },
+        
+        openModal(id) { document.getElementById(id).classList.add('active'); },
+        closeModal(id) { document.getElementById(id).classList.remove('active'); },
+        
+        render() {
+            const session = State.session;
+            const current = State.current;
+            const fatigue = State.fatigue;
+            
+            // HUD
+            if (session && session.attempts.length > 0) {
+                const acc = (session.correct / session.attempts.length * 100).toFixed(0);
+                const times = session.attempts.map(function(a) { return a.timeMs; });
+                const avgTime = (times.reduce(function(a,b) { return a+b; }, 0) / times.length / 1000).toFixed(1);
+                const replayRate = (session.attempts.filter(function(a) { return a.replays > 0; }).length / session.attempts.length * 100).toFixed(0);
+                
+                this.els.hudAccuracy.textContent = acc + '%';
+                this.els.hudTime.textContent = avgTime + 's';
+                this.els.hudReplay.textContent = replayRate + '%';
+            }
+            
+            // Level badge
+            this.els.questionLevel.textContent = DIFFICULTY_CONFIG[State.level].name;
+            
+            // Streak
+            if (session && session.streak >= 3) {
+                this.els.streakIndicator.classList.add('active');
+                this.els.streakCount.textContent = session.streak;
+            } else {
+                this.els.streakIndicator.classList.remove('active');
+            }
+            
+            // Recovery panel
+            if (session && fatigue.flag !== 'GREEN' && !fatigue.dismissed && session.attempts.length >= 15) {
+                this.els.recoveryPanel.classList.remove('hidden');
+            } else {
+                this.els.recoveryPanel.classList.add('hidden');
+            }
+            
+            // Current question display
+            if (current) {
+                this.els.questionType.textContent = current.type.toUpperCase();
+                this.els.reviewBadge.classList.toggle('hidden', !current.isReview);
+                
+                const display = this.els.mainDisplay;
+                display.classList.remove('listening', 'correct', 'wrong');
+                
+                if (State.isSpeaking) {
+                    display.classList.add('listening');
+                    display.innerHTML = '<span class="listening-icon">🎧</span>';
+                } else if (current.answered) {
+                    display.classList.add(current.isCorrect ? 'correct' : 'wrong');
+                    display.innerHTML = current.isCorrect ? '✓ ' + State.input : '<span class="animate-shake">' + (State.input || '—') + '</span>';
+                    this.els.feedback.innerHTML = current.isCorrect 
+                        ? '<div class="feedback-text correct">Correct!</div>'
+                        : '<div class="feedback-text wrong">Incorrect</div><div class="feedback-answer">Answer: ' + current.display + '</div>';
+                } else if (current.listened) {
+                    display.innerHTML = State.input ? State.input + '<span class="cursor"></span>' : '<span class="cursor"></span>';
+                    this.els.feedback.innerHTML = '';
+                } else {
+                    display.innerHTML = 'Press Listen';
+                    this.els.feedback.innerHTML = '';
+                }
+            } else {
+                this.els.mainDisplay.innerHTML = 'Press Listen to start';
+                this.els.feedback.innerHTML = '';
+                this.els.reviewBadge.classList.add('hidden');
+            }
+            
+            // Buttons
+            const canListen = State.voiceState === 'READY' && !State.isSpeaking && (!current || !current.answered);
+            const canReplay = State.voiceState === 'READY' && !State.isSpeaking && current && current.listened && !current.answered && 
+                             (State.params.maxReplays === null || (session && session.replaysUsed < State.params.maxReplays));
+            const canSubmit = !State.isSpeaking && current && current.listened && !current.answered && State.input.length > 0;
+            const canNext = current && current.answered && !State.isSpeaking;
+            
+            this.els.listenBtn.disabled = !canListen;
+            this.els.replayBtn.disabled = !canReplay;
+            this.els.submitBtn.disabled = !canSubmit;
+            this.els.nextBtn.disabled = !canNext;
+            
+            // Keypad
+            this.els.keypad.querySelectorAll('.key').forEach(function(k) {
+                k.disabled = State.isSpeaking || (current && current.answered);
+            });
+            
+            // Speed controls
+            this.els.speedDisplay.textContent = State.userRate.toFixed(2) + 'x';
+            this.els.speedSlider.value = State.userRate;
+            this.els.adaptiveToggle.classList.toggle('active', State.adaptiveOn);
+        },
+        
+        showSummary() {
+            const session = State.session;
+            const acc = session.attempts.length > 0 ? (session.correct / session.attempts.length * 100).toFixed(0) : 0;
+            const times = session.attempts.map(function(a) { return a.timeMs; });
+            const avgTime = times.length > 0 ? (times.reduce(function(a,b) { return a+b; }, 0) / times.length / 1000).toFixed(1) : '-';
+            
+            document.getElementById('summary-accuracy').textContent = acc + '%';
+            document.getElementById('summary-streak').textContent = session.bestStreak;
+            document.getElementById('summary-time').textContent = avgTime + 's';
+            document.getElementById('summary-count').textContent = session.attempts.length;
+            
+            const mistakesList = document.getElementById('mistakes-list');
+            mistakesList.innerHTML = '';
+            if (session.mistakes.length > 0) {
+                document.getElementById('mistakes-section').classList.remove('hidden');
+                session.mistakes.slice(0, 5).forEach(function(m) {
+                    const div = document.createElement('div');
+                    div.className = 'mistake-item';
+                    div.innerHTML = '<div><div class="answer">' + m.display + '</div><div class="type">' + m.type + '</div></div><span>→ ' + (m.userInput || '—') + '</span>';
+                    mistakesList.appendChild(div);
+                });
+            } else {
+                document.getElementById('mistakes-section').classList.add('hidden');
+            }
+            
+            this.openModal('summary-modal');
+        }
+    };
+
+    // ============================================
+    // App Controller
+    // ============================================
+    const App = {
+        timeInterval: null,
+        
+        start() {
+            const self = this;
+            UI.els.startBtn.disabled = true;
+            UI.els.startBtn.textContent = 'Initializing...';
+            
+            const prefs = Storage.getPrefs();
+            State.userRate = prefs.userRate || 0.95;
+            State.deviceOffset = prefs.deviceOffset || 1.0;
+            State.adaptiveOn = prefs.adaptiveOn !== false;
+            State.level = prefs.level || 2;
+            State.params = DIFFICULTY_CONFIG[State.level];
+            
+            AudioEngine.unlock().then(function(ok) {
+                if (ok) {
+                    if (!prefs.calibrated) {
+                        UI.openModal('calibration-modal');
+                    } else {
+                        self.beginSession();
+                    }
+                } else {
+                    UI.els.startBtn.disabled = false;
+                    UI.els.startBtn.textContent = 'Retry';
+                }
+            });
+        },
+        
+        beginSession() {
+            State.session = {
+                startedAt: Date.now(),
+                attempts: [],
+                correct: 0,
+                streak: 0,
+                bestStreak: 0,
+                replaysUsed: 0,
+                mistakes: []
+            };
+            State.current = null;
+            State.fatigue = { flag: 'GREEN', dismissed: false };
+            State.input = '';
+            
+            const band = State.params.rateBand;
+            const base = State.userRate * State.deviceOffset;
+            State.effectiveRate = Math.max(band.min, Math.min(band.max, base));
+            
+            UI.showScreen('TRAINING');
+            UI.render();
+        },
+        
+        listen() {
+            const self = this;
+            if (State.isSpeaking || State.voiceState !== 'READY') return;
+            
+            let question;
+            const shouldReview = Math.random() < State.reviewRatio;
+            const reviewItem = shouldReview ? SRS.pickReviewItem() : null;
+            
+            if (reviewItem) {
+                question = { type: reviewItem.type, level: State.level, raw: reviewItem.raw, display: reviewItem.display, spoken: reviewItem.spoken, isReview: true };
+            } else {
+                question = NumberFactory.generate(State.level);
+                question.isReview = false;
+            }
+            
+            question.listened = false;
+            question.answered = false;
+            question.isCorrect = null;
+            question.startedAt = Date.now();
+            
+            State.current = question;
+            State.input = '';
+            UI.render();
+            
+            AudioEngine.speak(question.spoken, State.effectiveRate).then(function(ok) {
+                if (ok) {
+                    question.listened = true;
+                    question.listenEndedAt = Date.now();
+                    if (State.params.timeLimitSec) {
+                        self.startTimeLimit(State.params.timeLimitSec);
+                    }
+                }
+                UI.render();
+            });
+        },
+        
+        replay() {
+            const self = this;
+            const current = State.current;
+            if (!current || current.answered || State.isSpeaking) return;
+            if (State.params.maxReplays !== null && State.session.replaysUsed >= State.params.maxReplays) return;
+            
+            State.session.replaysUsed++;
+            AudioEngine.speak(current.spoken, State.effectiveRate).then(function() {
+                UI.render();
+            });
+        },
+        
+        handleInput(val) {
+            if (State.isSpeaking || !State.current || State.current.answered) return;
+            
+            if (val === 'del') {
+                State.input = State.input.slice(0, -1);
+            } else if (val === '.' && !State.input.includes('.')) {
+                State.input += val;
+            } else if (val !== '.') {
+                if (State.input.length < 15) State.input += val;
+            }
+            UI.render();
+        },
+        
+        submit() {
+            const current = State.current;
+            if (!current || current.answered || State.input.length === 0) return;
+            
+            this.clearTimeLimit();
+            
+            const isCorrect = Validator.check(State.input, current.raw, current.type);
+            current.answered = true;
+            current.isCorrect = isCorrect;
+            current.userInput = State.input;
+            
+            const timeMs = Date.now() - current.listenEndedAt;
+            const replays = State.session.replaysUsed;
+            
+            State.session.attempts.push({ ok: isCorrect, timeMs: timeMs, replays: replays, type: current.type });
+            
+            if (isCorrect) {
+                State.session.correct++;
+                State.session.streak++;
+                State.session.bestStreak = Math.max(State.session.bestStreak, State.session.streak);
+            } else {
+                State.session.streak = 0;
+                State.session.mistakes.push(current);
+            }
+            
+            State.session.replaysUsed = 0;
+            
+            const q = SRS.gradeAttempt(isCorrect, timeMs, replays, State.params.targetTimeMs);
+            SRS.addOrUpdateItem(current, q);
+            
+            State.fatigue = FatigueDetector.check(State.session.attempts);
+            
+            UI.render();
+        },
+        
+        next() {
+            if (!State.current || !State.current.answered) return;
+            State.current = null;
+            State.input = '';
+            UI.render();
+            this.listen();
+        },
+        
+        startTimeLimit(seconds) {
+            this.clearTimeLimit();
+            const bar = UI.els.timeBar;
+            bar.style.width = '100%';
+            bar.style.transition = 'none';
+            
+            var self = this;
+            requestAnimationFrame(function() {
+                bar.style.transition = 'width ' + seconds + 's linear';
+                bar.style.width = '0%';
+            });
+            
+            this.timeInterval = setTimeout(function() {
+                if (State.current && !State.current.answered) {
+                    self.submit();
+                }
+            }, seconds * 1000);
+        },
+        
+        clearTimeLimit() {
+            if (this.timeInterval) {
+                clearTimeout(this.timeInterval);
+                this.timeInterval = null;
+            }
+            UI.els.timeBar.style.transition = 'none';
+            UI.els.timeBar.style.width = '100%';
+        },
+        
+        exit() {
+            this.clearTimeLimit();
+            AudioEngine.synth.cancel();
+            State.isSpeaking = false;
+            
+            var session = State.session;
+            if (session && session.attempts.length > 0) {
+                var acc = session.correct / session.attempts.length;
+                
+                Storage.addSession({ ts: Date.now(), accuracy: acc, count: session.attempts.length, level: State.level });
+                
+                var prefs = Storage.getPrefs();
+                prefs.totalScore = (prefs.totalScore || 0) + session.correct * 10;
+                prefs.bestStreak = Math.max(prefs.bestStreak || 0, session.bestStreak);
+                prefs.level = State.level;
+                prefs.userRate = State.userRate;
+                prefs.adaptiveOn = State.adaptiveOn;
+                Storage.savePrefs(prefs);
+                
+                UI.showSummary();
+            } else {
+                this.goHome();
+            }
+        },
+        
+        closeSummary() {
+            UI.closeModal('summary-modal');
+            this.goHome();
+        },
+        
+        practiceMistakes() {
+            UI.closeModal('summary-modal');
+            State.reviewRatio = 0.8;
+            this.beginSession();
+        },
+        
+        goHome() {
+            State.reviewRatio = 0.30;
+            UI.showScreen('HOME');
+            UI.updateHome();
+            UI.els.startBtn.disabled = false;
+            UI.els.startBtn.textContent = 'Start Training';
+        },
+        
+        enableRecovery() {
+            State.userRate = Math.max(0.7, State.userRate - 0.1);
+            State.fatigue.dismissed = true;
+            UI.render();
+        },
+        
+        dismissRecovery() {
+            State.fatigue.dismissed = true;
+            UI.render();
+        },
+        
+        updateSpeed() {
+            State.userRate = parseFloat(UI.els.speedSlider.value);
+            var band = State.params.rateBand;
+            var base = State.userRate * State.deviceOffset;
+            State.effectiveRate = Math.max(band.min, Math.min(band.max, base + State.adaptiveDelta));
+            UI.render();
+        },
+        
+        previewSpeed() {
+            if (State.isSpeaking) return;
+            AudioEngine.speak('Testing one two three', State.effectiveRate);
+        },
+        
+        toggleAdaptive() {
+            State.adaptiveOn = !State.adaptiveOn;
+            if (!State.adaptiveOn) State.adaptiveDelta = 0;
+            UI.render();
+        },
+        
+        startCalibration() {
+            UI.closeModal('speed-modal');
+            UI.openModal('calibration-modal');
+        },
+        
+        playCalibSample(sample) {
+            if (State.isSpeaking) return;
+            var rate = sample === 'A' ? 1.0 : 0.85;
+            State.isSpeaking = true;
+            AudioEngine.speakOnce('The total is forty five dollars and sixty cents', { rate: rate }).then(function() {
+                State.isSpeaking = false;
+            });
+        },
+        
+        selectCalib(choice) {
+            State.deviceOffset = choice === 'A' ? 1.0 : 0.85;
+            
+            var prefs = Storage.getPrefs();
+            prefs.deviceOffset = State.deviceOffset;
+            prefs.calibrated = true;
+            Storage.savePrefs(prefs);
+            
+            UI.closeModal('calibration-modal');
+            
+            if (State.currentScreen === 'HOME') {
+                this.beginSession();
+            }
+        }
+    };
+
+    // ============================================
+    // Event Listeners
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        UI.init();
+        
+        // Start button
+        UI.els.startBtn.addEventListener('click', function() { App.start(); });
+        
+        // Keypad
+        UI.els.keypad.addEventListener('click', function(e) {
+            var key = e.target.closest('.key');
+            if (key && !key.disabled) App.handleInput(key.getAttribute('data-val'));
+        });
+        
+        // Control buttons
+        document.getElementById('listen-btn').addEventListener('click', function() { App.listen(); });
+        document.getElementById('replay-btn').addEventListener('click', function() { App.replay(); });
+        document.getElementById('next-btn').addEventListener('click', function() { App.next(); });
+        document.getElementById('submit-btn').addEventListener('click', function() { App.submit(); });
+        
+        // Recovery buttons
+        document.getElementById('recover-btn').addEventListener('click', function() { App.enableRecovery(); });
+        document.getElementById('dismiss-btn').addEventListener('click', function() { App.dismissRecovery(); });
+        
+        // Top bar buttons
+        document.getElementById('speed-btn').addEventListener('click', function() { UI.openModal('speed-modal'); });
+        document.getElementById('exit-btn').addEventListener('click', function() { App.exit(); });
+        
+        // Speed controls
+        document.getElementById('speed-slider').addEventListener('input', function() { App.updateSpeed(); });
+        document.getElementById('preview-btn').addEventListener('click', function() { App.previewSpeed(); });
+        document.getElementById('adaptive-toggle').addEventListener('click', function() { App.toggleAdaptive(); });
+        document.getElementById('calib-btn').addEventListener('click', function() { App.startCalibration(); });
+        
+        // Modal close buttons
+        document.getElementById('close-speed-modal').addEventListener('click', function() { UI.closeModal('speed-modal'); });
+        document.getElementById('close-summary-modal').addEventListener('click', function() { App.closeSummary(); });
+        document.getElementById('close-calib-modal').addEventListener('click', function() { UI.closeModal('calibration-modal'); });
+        
+        // Summary actions
+        document.getElementById('practice-mistakes-btn').addEventListener('click', function() { App.practiceMistakes(); });
+        document.getElementById('back-home-btn').addEventListener('click', function() { App.closeSummary(); });
+        
+        // Calibration
+        document.getElementById('sample-a-btn').addEventListener('click', function() { App.playCalibSample('A'); });
+        document.getElementById('sample-b-btn').addEventListener('click', function() { App.playCalibSample('B'); });
+        document.getElementById('select-a-btn').addEventListener('click', function() { App.selectCalib('A'); });
+        document.getElementById('select-b-btn').addEventListener('click', function() { App.selectCalib('B'); });
+        
+        // Carousel nav
+        document.getElementById('carousel-nav').addEventListener('click', function(e) {
+            var dot = e.target.closest('.carousel-dot');
+            if (dot) UI.goToCard(parseInt(dot.getAttribute('data-index')));
+        });
+        
+        // Touch swipe for carousel
+        var touchStartX = 0;
+        UI.els.carouselTrack.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        UI.els.carouselTrack.addEventListener('touchend', function(e) {
+            var diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                var newLevel = diff > 0 ? Math.min(5, UI.carouselIndex + 1) : Math.max(1, UI.carouselIndex - 1);
+                UI.goToCard(newLevel);
+            }
+        }, { passive: true });
+        
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (State.currentScreen !== 'TRAINING') return;
+            if (e.key >= '0' && e.key <= '9') App.handleInput(e.key);
+            else if (e.key === '.') App.handleInput('.');
+            else if (e.key === 'Backspace') App.handleInput('del');
+            else if (e.key === 'Enter') {
+                if (State.current && State.current.answered) App.next();
+                else App.submit();
+            }
+        });
+        
+        // Visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                AudioEngine.synth.cancel();
+                State.isSpeaking = false;
+                App.clearTimeLimit();
+            }
+        });
+        
+        // Load voices early
+        AudioEngine.loadVoices();
+    });
+})();
+</script>
+</body>
+</html>
