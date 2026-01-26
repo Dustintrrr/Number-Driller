@@ -1,668 +1,1589 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Number Decoder V2 | IELTS Training</title>
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --success: #10b981;
-            --error: #ef4444;
-            --warning: #f59e0b;
-            --bg: #0c0c1d;
-            --bg-gradient: linear-gradient(135deg, #0c0c1d 0%, #1a1a2e 50%, #16213e 100%);
-            --surface: #1e1e3f;
-            --surface-light: #2a2a5a;
-            --surface-hover: #3a3a6a;
-            --text: #f1f5f9;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
-            --border: #3f3f7a;
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Number Decoder</title>
+  
+  <!-- Fonts - 继承主站字体系统 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ========== DESIGN TOKENS - Claude Aesthetics ========== */
+    :root {
+      /* 色彩系统 */
+      --bg: #FDFBF7;
+      --bg-secondary: #F5F0E8;
+      --text-primary: #2D2926;
+      --text-secondary: #6B635B;
+      --text-tertiary: #9A958E;
+      --accent: #C4A77D;
+      --accent-light: rgba(196, 167, 125, 0.15);
+      --error: #9A6458;
+      --error-light: rgba(154, 100, 88, 0.1);
+      --border: rgba(45, 41, 38, 0.1);
+      --border-strong: rgba(45, 41, 38, 0.2);
+      
+      /* 字体系统 */
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'DM Sans', -apple-system, sans-serif;
+      
+      /* 间距 */
+      --space-xs: 0.5rem;
+      --space-sm: 0.75rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      
+      /* 过渡 */
+      --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-fast: 0.2s ease;
+      
+      /* 安全区域 */
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
 
-        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { height: 100%; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text);
-            margin: 0; padding: 0;
-            height: 100vh; height: 100dvh;
-            display: flex; flex-direction: column;
-            overflow: hidden;
-            user-select: none; -webkit-user-select: none;
-        }
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html { height: 100%; }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
-        @keyframes listening { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.15); opacity: 1; } }
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
 
-        .animate-shake { animation: shake 0.4s ease-in-out; }
+    /* ========== SCREEN SYSTEM ========== */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      transition: opacity var(--transition), visibility var(--transition);
+    }
+    
+    .screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
-        .screen { position: fixed; inset: 0; display: flex; flex-direction: column; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    /* ========== HOME SCREEN ========== */
+    .home-screen {
+      justify-content: center;
+      align-items: center;
+      padding: var(--space-xl);
+      padding-bottom: calc(var(--space-xl) + var(--safe-bottom));
+      text-align: center;
+    }
+    
+    .home-content {
+      max-width: 320px;
+      width: 100%;
+    }
+    
+    /* 标题区域 */
+    .home-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 6vw, 2.5rem);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      margin: 0 0 var(--space-xs);
+      color: var(--text-primary);
+      animation: slideUp 0.6s ease both;
+    }
+    
+    .home-subtitle {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin: 0 0 var(--space-2xl);
+      animation: slideUp 0.6s ease 0.1s both;
+    }
+    
+    /* 分隔线 */
+    .home-divider {
+      width: 60px;
+      height: 1px;
+      background: var(--border-strong);
+      margin: 0 auto var(--space-xl);
+      animation: fadeIn 0.8s ease 0.3s both;
+    }
+    
+    /* 难度选择 - 垂直列表 */
+    .level-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--space-xl);
+      animation: slideUp 0.6s ease 0.2s both;
+    }
+    
+    .level-item {
+      padding: var(--space-sm) var(--space-md);
+      margin: 0;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .level-item:hover {
+      background: var(--accent-light);
+    }
+    
+    .level-item.active {
+      background: var(--accent-light);
+    }
+    
+    .level-item.active .level-name {
+      color: var(--text-primary);
+    }
+    
+    .level-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 2px;
+      height: 100%;
+      background: var(--accent);
+    }
+    
+    .level-item {
+      position: relative;
+    }
+    
+    .level-name {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      transition: color var(--transition-fast);
+    }
+    
+    .level-meta {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    /* 开始按钮 */
+    .start-btn {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.05em;
+      animation: slideUp 0.6s ease 0.4s both;
+    }
+    
+    .start-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
+    }
+    
+    .start-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .start-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* 设置入口 */
+    .settings-link {
+      margin-top: var(--space-xl);
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      transition: color var(--transition-fast);
+      animation: fadeIn 0.6s ease 0.5s both;
+    }
+    
+    .settings-link:hover {
+      color: var(--text-secondary);
+    }
 
-        .home-screen { background: var(--bg-gradient); padding: 1.5rem; padding-bottom: calc(1.5rem + var(--safe-bottom)); justify-content: space-between; align-items: center; }
-        .home-header { text-align: center; animation: slideDown 0.5s ease-out; }
-        .home-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .home-header .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .stats-row { display: flex; gap: 1rem; margin-top: 1rem; }
-        .stat-badge { display: flex; align-items: center; gap: 0.4rem; background: var(--surface); padding: 0.5rem 0.75rem; border-radius: 20px; font-size: 0.85rem; }
-        .stat-badge .value { font-weight: 700; color: var(--primary-light); }
+    /* ========== TRAINING SCREEN ========== */
+    .training-screen {
+      background: var(--bg);
+      max-width: 500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    /* 顶部栏 */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .back-btn {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-xs);
+      margin-left: -var(--space-xs);
+      transition: color var(--transition-fast);
+    }
+    
+    .back-btn:hover {
+      color: var(--text-primary);
+    }
+    
+    .top-meta {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    .top-meta .type {
+      color: var(--text-secondary);
+    }
+    
+    /* HUD - 极简信息条 */
+    .hud-bar {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-lg);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .hud-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .hud-value {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-secondary);
+    }
+    
+    /* 进度条 - 极细 */
+    .progress-container {
+      height: 2px;
+      background: var(--bg-secondary);
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 100%;
+      transition: none;
+    }
+    
+    /* 主显示区域 */
+    .display-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl);
+      min-height: 0;
+    }
+    
+    .main-display {
+      font-family: var(--font-serif);
+      font-size: clamp(2.5rem, 10vw, 3.5rem);
+      font-weight: 300;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.08em;
+      min-height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: color var(--transition);
+    }
+    
+    .main-display.listening {
+      color: var(--text-tertiary);
+    }
+    
+    .main-display.correct {
+      color: var(--accent);
+    }
+    
+    .main-display.wrong {
+      color: var(--error);
+    }
+    
+    /* 光标 */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 2.5rem;
+      background: var(--text-primary);
+      margin-left: 2px;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    
+    /* 听音图标 */
+    .listening-icon {
+      font-size: 2rem;
+      animation: breathe 2s ease-in-out infinite;
+    }
+    
+    /* 反馈区域 */
+    .feedback {
+      min-height: 3rem;
+      margin-top: var(--space-md);
+      text-align: center;
+    }
+    
+    .feedback-text {
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .feedback-text.correct {
+      color: var(--accent);
+    }
+    
+    .feedback-text.wrong {
+      color: var(--error);
+    }
+    
+    .feedback-answer {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+    
+    .feedback-answer .correct-val {
+      color: var(--text-secondary);
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-underline-offset: 2px;
+    }
+    
+    /* 控制按钮区 */
+    .control-area {
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      justify-content: center;
+    }
+    
+    .listen-btn {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .listen-btn:hover:not(:disabled) {
+      border-color: var(--text-secondary);
+      color: var(--text-primary);
+    }
+    
+    .listen-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
+    .listen-btn .icon {
+      font-size: 1rem;
+    }
 
-        .identity-carousel { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 400px; animation: slideUp 0.5s ease-out 0.1s both; }
-        .carousel-container { width: 100%; overflow: hidden; cursor: grab; }
-        .carousel-container:active { cursor: grabbing; }
-        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        .identity-card { flex: 0 0 100%; padding: 1rem; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
-        .identity-card-inner { background: var(--surface); border: 2px solid var(--border); border-radius: 20px; padding: 1.5rem; width: 100%; text-align: center; transition: all 0.3s ease; }
-        .identity-card.active .identity-card-inner { border-color: var(--primary); box-shadow: 0 0 30px rgba(99, 102, 241, 0.2); }
-        .identity-icon { font-size: 3rem; margin-bottom: 0.75rem; }
-        .identity-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .identity-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
-        .identity-examples { font-size: 0.8rem; color: var(--primary-light); background: var(--surface-light); padding: 0.5rem 0.75rem; border-radius: 8px; margin-bottom: 0.75rem; }
-        .identity-tags { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
-        .identity-tag { background: var(--surface-light); padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.75rem; color: var(--text-muted); }
+    /* ========== KEYPAD ========== */
+    .keypad-container {
+      background: var(--bg-secondary);
+      padding: var(--space-md);
+      padding-bottom: calc(var(--space-md) + var(--safe-bottom));
+      border-top: 1px solid var(--border);
+    }
+    
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xs);
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    
+    .key {
+      aspect-ratio: 1.4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .key:hover:not(:disabled) {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+    
+    .key:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+    
+    .key:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .key.delete {
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+    
+    /* 提交行 */
+    .submit-row {
+      margin-top: var(--space-sm);
+      max-width: 280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .submit-btn {
+      width: 100%;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--bg);
+      background: var(--text-primary);
+      border: none;
+      padding: var(--space-sm);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .submit-btn:hover:not(:disabled) {
+      background: var(--text-secondary);
+    }
+    
+    .submit-btn:disabled {
+      background: var(--text-tertiary);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-        .carousel-arrows { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 0.5rem; padding: 0 0.5rem; }
-        .arrow-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .arrow-btn:hover { background: var(--surface-light); }
-        .arrow-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .carousel-nav { display: flex; justify-content: center; gap: 0.5rem; }
-        .carousel-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-light); border: none; cursor: pointer; transition: all 0.3s ease; }
-        .carousel-dot.active { background: var(--primary); transform: scale(1.2); }
+    /* ========== MODAL / OVERLAY ========== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(253, 251, 247, 0.95);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition);
+      padding: var(--space-lg);
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 360px;
+      padding: var(--space-xl);
+      border-radius: 8px;
+      transform: translateY(20px);
+      transition: transform var(--transition);
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .modal-header h2 {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin: 0;
+    }
+    
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color var(--transition-fast);
+    }
+    
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
 
-        .mastery-section { width: 100%; max-width: 400px; animation: slideUp 0.5s ease-out 0.2s both; }
-        .mastery-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; text-align: center; }
-        .mastery-dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 1rem; background: var(--surface); border-radius: 12px; }
-        .mastery-dot { aspect-ratio: 1; border-radius: 3px; background: var(--surface-light); }
-        .mastery-dot.low { background: #374151; }
-        .mastery-dot.medium { background: #065f46; }
-        .mastery-dot.high { background: #10b981; }
-        .mastery-dot.perfect { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; }
+    /* ========== SPEED SETTINGS ========== */
+    .speed-control {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .speed-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .speed-value {
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+    }
+    
+    .speed-slider {
+      width: 100%;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--bg-secondary);
+      border-radius: 2px;
+      outline: none;
+    }
+    
+    .speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--text-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+    }
+    
+    .speed-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+    
+    .speed-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-xs);
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+    }
+    
+    .preview-btn {
+      width: 100%;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      border: none;
+      padding: var(--space-sm);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-top: var(--space-md);
+    }
+    
+    .preview-btn:hover {
+      background: var(--accent-light);
+    }
+    
+    .rate-info {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      text-align: center;
+      margin-top: var(--space-md);
+    }
 
-        .start-btn { width: 100%; max-width: 400px; padding: 1rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); transition: all 0.2s ease; animation: slideUp 0.5s ease-out 0.3s both; }
-        .start-btn:active { transform: scale(0.98); }
-        .start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    /* ========== SUMMARY ========== */
+    .summary-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 300;
+      text-align: center;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .summary-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .summary-stat {
+      text-align: center;
+    }
+    
+    .summary-stat .value {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .summary-stat .label {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: var(--space-xs);
+    }
+    
+    .summary-stat.highlight .value {
+      color: var(--accent);
+    }
+    
+    /* 错题列表 */
+    .mistakes-section {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .mistakes-title {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .mistake-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm);
+      background: var(--error-light);
+      border-radius: 4px;
+      margin-bottom: var(--space-xs);
+      font-size: 0.85rem;
+    }
+    
+    .mistake-item .correct-answer {
+      color: var(--text-primary);
+    }
+    
+    .mistake-item .user-answer {
+      color: var(--error);
+      text-decoration: line-through;
+    }
+    
+    /* 操作按钮 */
+    .summary-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .action-btn {
+      width: 100%;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      padding: var(--space-sm);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .action-btn.primary {
+      background: var(--text-primary);
+      color: var(--bg);
+      border: none;
+    }
+    
+    .action-btn.primary:hover {
+      background: var(--text-secondary);
+    }
+    
+    .action-btn.secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    
+    .action-btn.secondary:hover {
+      border-color: var(--text-secondary);
+    }
 
-        .training-screen { background: var(--bg-gradient); max-width: 500px; margin: 0 auto; width: 100%; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(30, 30, 63, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
-        .hud-stats { display: flex; gap: 1rem; }
-        .hud-stat { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; }
-        .hud-stat .value { font-size: 1rem; font-weight: 700; color: var(--primary-light); }
-        .hud-stat .label { color: var(--text-dim); }
-        .top-bar-actions { display: flex; gap: 0.5rem; }
-        .icon-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer; }
-        .icon-btn:active { background: var(--surface-hover); }
+    /* ========== CALIBRATION ========== */
+    .calibration-content {
+      text-align: center;
+    }
+    
+    .calibration-content h3 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin: 0 0 var(--space-xs);
+    }
+    
+    .calibration-content p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0 0 var(--space-lg);
+    }
+    
+    .calibration-samples {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .sample-btn {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      border: none;
+      padding: var(--space-sm);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .sample-btn:hover {
+      background: var(--accent-light);
+    }
+    
+    .calibration-choices {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .choice-btn {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--bg);
+      background: var(--text-primary);
+      border: none;
+      padding: var(--space-sm);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .choice-btn:hover {
+      background: var(--text-secondary);
+    }
 
-        .progress-bar-container { height: 3px; background: var(--surface); }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--success), var(--warning), var(--error)); width: 100%; }
-
-        .control-bar { display: flex; gap: 0.5rem; padding: 0.75rem 1rem; background: var(--surface); }
-        .ctrl-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.7rem; background: var(--surface-light); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; }
-        .ctrl-btn:active:not(:disabled) { transform: scale(0.97); background: var(--surface-hover); }
-        .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .ctrl-btn.primary { background: var(--primary); border-color: var(--primary); }
-        .ctrl-btn.primary:active:not(:disabled) { background: var(--primary-dark); }
-
-        .display-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; position: relative; min-height: 0; }
-        .question-meta { display: flex; gap: 0.75rem; margin-bottom: 0.5rem; align-items: center; }
-        .meta-tag { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .speed-indicator { font-size: 0.7rem; color: var(--primary-light); background: var(--surface); padding: 0.2rem 0.5rem; border-radius: 8px; }
-
-        .main-display { font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.05em; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 1rem; }
-        .main-display.listening { color: var(--primary-light); }
-        .main-display.correct { color: var(--success); }
-        .main-display.wrong { color: var(--error); }
-        .listening-icon { font-size: 3.5rem; animation: listening 1.5s ease-in-out infinite; }
-        .cursor { display: inline-block; width: 3px; height: 2.2rem; background: var(--primary); margin-left: 2px; animation: pulse 1s ease-in-out infinite; }
-
-        .feedback { min-height: 2.5rem; margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-        .feedback-text { font-size: 1rem; font-weight: 600; }
-        .feedback-text.correct { color: var(--success); }
-        .feedback-text.wrong { color: var(--error); }
-        .feedback-answer { font-size: 0.9rem; color: var(--text-muted); }
-
-        .streak-indicator { position: absolute; top: 1rem; right: 1rem; display: flex; align-items: center; gap: 0.3rem; font-size: 1.2rem; font-weight: 700; color: var(--warning); opacity: 0; transition: opacity 0.3s ease; }
-        .streak-indicator.active { opacity: 1; }
-
-        .keypad-container { background: var(--surface); padding: 0.75rem; padding-bottom: calc(0.75rem + var(--safe-bottom)); border-top: 1px solid var(--border); }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-width: 360px; margin: 0 auto; }
-        .key { aspect-ratio: 1.5; min-height: 50px; display: flex; align-items: center; justify-content: center; background: var(--surface-light); border: none; border-radius: 12px; font-size: 1.5rem; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.1s ease; box-shadow: 0 2px 0 var(--border); }
-        .key:active { transform: translateY(2px); box-shadow: none; background: var(--surface-hover); }
-        .key:disabled { opacity: 0.3; cursor: not-allowed; }
-        .key.delete { background: var(--surface-hover); }
-        .submit-row { margin-top: 0.5rem; max-width: 360px; margin-left: auto; margin-right: auto; }
-        .submit-row .ctrl-btn { width: 100%; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-content { background: var(--surface); width: 100%; max-width: 500px; max-height: 85vh; border-radius: 24px 24px 0 0; padding: 1.5rem; padding-bottom: calc(1.5rem + var(--safe-bottom)); transform: translateY(100%); transition: transform 0.3s ease; overflow-y: auto; }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .modal-header h2 { font-size: 1.25rem; margin: 0; }
-        .modal-close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--surface-light); border: none; border-radius: 50%; color: var(--text); font-size: 1.2rem; cursor: pointer; }
-
-        .speed-control { padding: 1rem; background: var(--surface-light); border-radius: 16px; margin-bottom: 1rem; }
-        .speed-label { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.9rem; }
-        .speed-value { color: var(--primary-light); font-weight: 600; }
-        .speed-slider { width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: var(--surface); border-radius: 4px; outline: none; }
-        .speed-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: var(--primary); border-radius: 50%; cursor: pointer; }
-        .speed-marks { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-dim); }
-        .preview-btn { width: 100%; padding: 0.75rem; background: var(--surface-light); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 0.9rem; cursor: pointer; margin-top: 1rem; }
-
-        .summary-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-        .summary-stat { background: var(--surface-light); padding: 1rem; border-radius: 12px; text-align: center; }
-        .summary-stat .value { font-size: 2rem; font-weight: 700; color: var(--primary-light); }
-        .summary-stat .label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
-        .summary-stat.highlight { border: 1px solid var(--success); }
-        .summary-stat.highlight .value { color: var(--success); }
-        .mistakes-section { margin-bottom: 1.5rem; }
-        .mistakes-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; }
-        .mistake-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--surface-light); border-radius: 10px; margin-bottom: 0.5rem; }
-        .summary-actions { display: flex; flex-direction: column; gap: 0.75rem; }
-        .summary-actions .ctrl-btn { width: 100%; padding: 1rem; }
-
-        .calibration-step { text-align: center; padding: 1rem; }
-        .calibration-step h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .calibration-step p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
-        .calibration-options { display: flex; flex-direction: column; gap: 0.75rem; }
-        .calibration-options .ctrl-btn { padding: 1rem; }
-
-        .hidden { display: none !important; }
-        @media (max-height: 650px) { .main-display { font-size: 2rem; } .key { min-height: 45px; font-size: 1.3rem; } }
-    </style>
+    /* ========== UTILITIES ========== */
+    .hidden {
+      display: none !important;
+    }
+    
+    /* ========== RESPONSIVE ========== */
+    @media (max-height: 650px) {
+      .main-display {
+        font-size: 2rem;
+      }
+      .key {
+        aspect-ratio: 1.6;
+        font-size: 1.2rem;
+      }
+    }
+    
+    @media (max-width: 360px) {
+      .level-list {
+        margin-bottom: var(--space-lg);
+      }
+      .home-title {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="home-screen" class="screen home-screen">
-        <div class="home-header">
-            <h1>Number Decoder</h1>
-            <p class="subtitle">IELTS Listening Training</p>
-            <div class="stats-row">
-                <div class="stat-badge"><span>🏆</span><span class="value" id="total-score">0</span></div>
-                <div class="stat-badge"><span>🔥</span><span class="value" id="best-streak">0</span></div>
-            </div>
-        </div>
-
-        <div class="identity-carousel">
-            <div class="carousel-container" id="carousel-container">
-                <div class="carousel-track" id="carousel-track">
-                    <div class="identity-card active" data-level="1">
-                        <div class="identity-card-inner">
-                            <div class="identity-icon">🌴</div>
-                            <div class="identity-name">Tourist</div>
-                            <div class="identity-desc">Very Slow & Simple</div>
-                            <div class="identity-examples">Examples: "42", "$15", "2020"</div>
-                            <div class="identity-tags">
-                                <span class="identity-tag">3-4 digits</span>
-                                <span class="identity-tag">0.6x speed</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="identity-card" data-level="2">
-                        <div class="identity-card-inner">
-                            <div class="identity-icon">🏠</div>
-                            <div class="identity-name">Expat</div>
-                            <div class="identity-desc">Slow & Clear</div>
-                            <div class="identity-examples">Examples: "1234", "$45.50"</div>
-                            <div class="identity-tags">
-                                <span class="identity-tag">4 digits</span>
-                                <span class="identity-tag">0.75x speed</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="identity-card" data-level="3">
-                        <div class="identity-card-inner">
-                            <div class="identity-icon">🗣️</div>
-                            <div class="identity-name">Native</div>
-                            <div class="identity-desc">Normal Speed</div>
-                            <div class="identity-examples">Examples: "555-1234"</div>
-                            <div class="identity-tags">
-                                <span class="identity-tag">7 digits</span>
-                                <span class="identity-tag">1.0x speed</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="identity-card" data-level="4">
-                        <div class="identity-card-inner">
-                            <div class="identity-icon">🕵️</div>
-                            <div class="identity-name">Spy</div>
-                            <div class="identity-desc">Fast + Fillers</div>
-                            <div class="identity-examples">"Okay, it's $199.99"</div>
-                            <div class="identity-tags">
-                                <span class="identity-tag">10 digits</span>
-                                <span class="identity-tag">1.15x speed</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="identity-card" data-level="5">
-                        <div class="identity-card-inner">
-                            <div class="identity-icon">👑</div>
-                            <div class="identity-name">Expert</div>
-                            <div class="identity-desc">Extreme Challenge</div>
-                            <div class="identity-examples">"The total comes to..."</div>
-                            <div class="identity-tags">
-                                <span class="identity-tag">Full context</span>
-                                <span class="identity-tag">1.3x speed</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="carousel-arrows">
-                <button class="arrow-btn" id="prev-btn">←</button>
-                <div class="carousel-nav" id="carousel-nav"></div>
-                <button class="arrow-btn" id="next-level-btn">→</button>
-            </div>
-        </div>
-
-        <div class="mastery-section">
-            <div class="mastery-title">Recent Sessions</div>
-            <div class="mastery-dots" id="mastery-dots"></div>
-        </div>
-
-        <button class="start-btn" id="start-btn">Start Training</button>
+  <!-- ========== HOME SCREEN ========== -->
+  <div id="home-screen" class="screen home-screen">
+    <div class="home-content">
+      <h1 class="home-title">Number Decoder</h1>
+      <p class="home-subtitle">Listening · IELTS</p>
+      
+      <div class="home-divider"></div>
+      
+      <ul class="level-list" id="level-list">
+        <li class="level-item active" data-level="1">
+          <span class="level-name">Tourist</span>
+          <span class="level-meta">0.6×</span>
+        </li>
+        <li class="level-item" data-level="2">
+          <span class="level-name">Expat</span>
+          <span class="level-meta">0.75×</span>
+        </li>
+        <li class="level-item" data-level="3">
+          <span class="level-name">Native</span>
+          <span class="level-meta">1.0×</span>
+        </li>
+        <li class="level-item" data-level="4">
+          <span class="level-name">Spy</span>
+          <span class="level-meta">1.15×</span>
+        </li>
+        <li class="level-item" data-level="5">
+          <span class="level-name">Expert</span>
+          <span class="level-meta">1.3×</span>
+        </li>
+      </ul>
+      
+      <button class="start-btn" id="start-btn">Begin</button>
+      
+      <div class="settings-link" id="settings-link">Speed Settings</div>
     </div>
+  </div>
 
-    <div id="training-screen" class="screen training-screen hidden">
-        <div class="top-bar">
-            <div class="hud-stats">
-                <div class="hud-stat"><span class="value" id="hud-accuracy">--%</span><span class="label">Accuracy</span></div>
-                <div class="hud-stat"><span class="value" id="hud-time">--s</span><span class="label">Avg Time</span></div>
-            </div>
-            <div class="top-bar-actions">
-                <button class="icon-btn" id="speed-btn" title="Speed">⏱️</button>
-                <button class="icon-btn" id="exit-btn" title="Exit">✕</button>
-            </div>
-        </div>
-        <div class="progress-bar-container"><div class="progress-bar" id="time-bar"></div></div>
-        <div class="control-bar">
-            <button class="ctrl-btn primary" id="listen-btn"><span>🔊</span> Listen</button>
-            <button class="ctrl-btn" id="replay-btn" disabled><span>↺</span> Replay</button>
-            <button class="ctrl-btn" id="next-btn" disabled><span>→</span> Next</button>
-        </div>
-        <div class="display-area">
-            <div id="streak-indicator" class="streak-indicator"><span>🔥</span><span id="streak-count">0</span></div>
-            <div class="question-meta">
-                <span class="meta-tag" id="question-type">--</span>
-                <span class="meta-tag" id="question-level">L1</span>
-                <span class="speed-indicator" id="speed-indicator">1.0x</span>
-            </div>
-            <div id="main-display" class="main-display">Press Listen to start</div>
-            <div id="feedback" class="feedback"></div>
-        </div>
-        <div class="keypad-container">
-            <div class="keypad" id="keypad">
-                <button class="key" data-val="1">1</button>
-                <button class="key" data-val="2">2</button>
-                <button class="key" data-val="3">3</button>
-                <button class="key" data-val="4">4</button>
-                <button class="key" data-val="5">5</button>
-                <button class="key" data-val="6">6</button>
-                <button class="key" data-val="7">7</button>
-                <button class="key" data-val="8">8</button>
-                <button class="key" data-val="9">9</button>
-                <button class="key" data-val=".">.</button>
-                <button class="key" data-val="0">0</button>
-                <button class="key delete" data-val="del">⌫</button>
-            </div>
-            <div class="submit-row"><button class="ctrl-btn primary" id="submit-btn">Submit</button></div>
-        </div>
+  <!-- ========== TRAINING SCREEN ========== -->
+  <div id="training-screen" class="screen training-screen hidden">
+    <div class="top-bar">
+      <button class="back-btn" id="exit-btn">← Back</button>
+      <div class="top-meta">
+        <span class="type" id="question-type">--</span>
+        <span> · </span>
+        <span id="question-level">L1</span>
+      </div>
     </div>
+    
+    <div class="hud-bar">
+      <div class="hud-item">
+        <span>Accuracy</span>
+        <span class="hud-value" id="hud-accuracy">--%</span>
+      </div>
+      <div class="hud-item">
+        <span>Avg</span>
+        <span class="hud-value" id="hud-time">--s</span>
+      </div>
+    </div>
+    
+    <div class="progress-container">
+      <div class="progress-bar" id="time-bar"></div>
+    </div>
+    
+    <div class="display-area">
+      <div id="main-display" class="main-display">Press Listen</div>
+      <div id="feedback" class="feedback"></div>
+    </div>
+    
+    <div class="control-area">
+      <button class="listen-btn" id="listen-btn">
+        <span class="icon">♪</span>
+        <span id="listen-text">Listen</span>
+      </button>
+    </div>
+    
+    <div class="keypad-container">
+      <div class="keypad" id="keypad">
+        <button class="key" data-val="1">1</button>
+        <button class="key" data-val="2">2</button>
+        <button class="key" data-val="3">3</button>
+        <button class="key" data-val="4">4</button>
+        <button class="key" data-val="5">5</button>
+        <button class="key" data-val="6">6</button>
+        <button class="key" data-val="7">7</button>
+        <button class="key" data-val="8">8</button>
+        <button class="key" data-val="9">9</button>
+        <button class="key" data-val=".">.</button>
+        <button class="key" data-val="0">0</button>
+        <button class="key delete" data-val="del">⌫</button>
+      </div>
+      <div class="submit-row">
+        <button class="submit-btn" id="submit-btn">Submit</button>
+      </div>
+    </div>
+  </div>
 
-    <div id="speed-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header"><h2>Speed Settings</h2><button class="modal-close" id="close-speed-modal">×</button></div>
-            <div class="speed-control">
-                <div class="speed-label"><span>Speed Multiplier</span><span class="speed-value" id="speed-display">1.0x</span></div>
-                <input type="range" class="speed-slider" id="speed-slider" min="0.5" max="1.5" step="0.05" value="1.0">
-                <div class="speed-marks"><span>0.5x</span><span>1.0x</span><span>1.5x</span></div>
-            </div>
-            <button class="preview-btn" id="preview-btn">🔊 Preview Speed</button>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; text-align: center;">
-                Final rate = Level base × Multiplier<br>
-                <span id="final-rate-info" style="color: var(--primary-light);">0.60 × 1.00 = 0.60x</span>
-            </p>
+  <!-- ========== SPEED MODAL ========== -->
+  <div id="speed-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Speed</h2>
+        <button class="modal-close" id="close-speed-modal">×</button>
+      </div>
+      <div class="speed-control">
+        <div class="speed-label">
+          <span>Multiplier</span>
+          <span class="speed-value" id="speed-display">1.0×</span>
         </div>
+        <input type="range" class="speed-slider" id="speed-slider" min="0.5" max="1.5" step="0.05" value="1.0">
+        <div class="speed-marks">
+          <span>0.5×</span>
+          <span>1.0×</span>
+          <span>1.5×</span>
+        </div>
+      </div>
+      <button class="preview-btn" id="preview-btn">Preview Speed</button>
+      <p class="rate-info">
+        Final = Base × Multiplier<br>
+        <span id="final-rate-info">0.60 × 1.00 = 0.60×</span>
+      </p>
     </div>
+  </div>
 
-    <div id="summary-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header"><h2>Session Complete</h2><button class="modal-close" id="close-summary-modal">×</button></div>
-            <div class="summary-stats">
-                <div class="summary-stat highlight"><div class="value" id="summary-accuracy">85%</div><div class="label">Accuracy</div></div>
-                <div class="summary-stat"><div class="value" id="summary-streak">12</div><div class="label">Best Streak</div></div>
-                <div class="summary-stat"><div class="value" id="summary-time">2.8s</div><div class="label">Avg Time</div></div>
-                <div class="summary-stat"><div class="value" id="summary-count">25</div><div class="label">Questions</div></div>
-            </div>
-            <div class="mistakes-section" id="mistakes-section">
-                <div class="mistakes-title">Mistakes</div>
-                <div id="mistakes-list"></div>
-            </div>
-            <div class="summary-actions">
-                <button class="ctrl-btn primary" id="practice-mistakes-btn">📚 Continue</button>
-                <button class="ctrl-btn" id="back-home-btn">Back to Home</button>
-            </div>
+  <!-- ========== SUMMARY MODAL ========== -->
+  <div id="summary-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h2 class="summary-title">Session Complete</h2>
+      
+      <div class="summary-stats">
+        <div class="summary-stat highlight">
+          <div class="value" id="summary-accuracy">85%</div>
+          <div class="label">Accuracy</div>
         </div>
+        <div class="summary-stat">
+          <div class="value" id="summary-time">2.8s</div>
+          <div class="label">Avg Time</div>
+        </div>
+      </div>
+      
+      <div class="mistakes-section" id="mistakes-section">
+        <div class="mistakes-title">Mistakes</div>
+        <div id="mistakes-list"></div>
+      </div>
+      
+      <div class="summary-actions">
+        <button class="action-btn primary" id="continue-btn">Continue</button>
+        <button class="action-btn secondary" id="back-home-btn">Back to Home</button>
+      </div>
     </div>
+  </div>
 
-    <div id="calibration-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header"><h2>Speed Calibration</h2><button class="modal-close" id="close-calib-modal">×</button></div>
-            <div class="calibration-step">
-                <h3>Listen to both samples</h3>
-                <p>Which sounds like normal speaking speed?</p>
-                <div class="calibration-options">
-                    <button class="ctrl-btn" id="sample-a-btn">🔊 Sample A (faster)</button>
-                    <button class="ctrl-btn" id="sample-b-btn">🔊 Sample B (slower)</button>
-                </div>
-                <div class="calibration-options" style="margin-top: 1.5rem;">
-                    <button class="ctrl-btn primary" id="select-a-btn">A is Normal</button>
-                    <button class="ctrl-btn primary" id="select-b-btn">B is Normal</button>
-                </div>
-            </div>
+  <!-- ========== CALIBRATION MODAL ========== -->
+  <div id="calibration-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Calibration</h2>
+        <button class="modal-close" id="close-calib-modal">×</button>
+      </div>
+      <div class="calibration-content">
+        <h3>Listen to both samples</h3>
+        <p>Which sounds like normal speaking speed?</p>
+        
+        <div class="calibration-samples">
+          <button class="sample-btn" id="sample-a-btn">♪ Sample A (faster)</button>
+          <button class="sample-btn" id="sample-b-btn">♪ Sample B (slower)</button>
         </div>
+        
+        <div class="calibration-choices">
+          <button class="choice-btn" id="select-a-btn">A is Normal</button>
+          <button class="choice-btn" id="select-b-btn">B is Normal</button>
+        </div>
+      </div>
     </div>
+  </div>
 
 <script>
 (function() {
-    'use strict';
+  'use strict';
 
-    // ========== DIFFICULTY CONFIG ==========
-    const DIFF = {
-        1: { name: 'Tourist', baseRate: 0.60, phone: 3, price: [1, 50, false], year: [2015, 2024], pct: [50, false], filler: false, context: false, time: null },
-        2: { name: 'Expat', baseRate: 0.75, phone: 4, price: [1, 100, true], year: [2000, 2024], pct: [100, false], filler: false, context: false, time: null },
-        3: { name: 'Native', baseRate: 1.00, phone: 7, price: [1, 300, true], year: [1980, 2024], pct: [100, true], filler: false, context: false, time: 12 },
-        4: { name: 'Spy', baseRate: 1.15, phone: 10, price: [1, 500, true], year: [1950, 2024], pct: [100, true], filler: true, context: false, time: 10 },
-        5: { name: 'Expert', baseRate: 1.30, phone: 10, price: [1, 1000, true], year: [1900, 2024], pct: [100, true], filler: true, context: true, time: 8 }
-    };
+  // ========== DIFFICULTY CONFIG ==========
+  const DIFF = {
+    1: { name: 'Tourist', baseRate: 0.60, phone: 3, price: [1, 50, false], year: [2015, 2024], pct: [50, false], filler: false, context: false, time: null },
+    2: { name: 'Expat', baseRate: 0.75, phone: 4, price: [1, 100, true], year: [2000, 2024], pct: [100, false], filler: false, context: false, time: null },
+    3: { name: 'Native', baseRate: 1.00, phone: 7, price: [1, 300, true], year: [1980, 2024], pct: [100, true], filler: false, context: false, time: 12 },
+    4: { name: 'Spy', baseRate: 1.15, phone: 10, price: [1, 500, true], year: [1950, 2024], pct: [100, true], filler: true, context: false, time: 10 },
+    5: { name: 'Expert', baseRate: 1.30, phone: 10, price: [1, 1000, true], year: [1900, 2024], pct: [100, true], filler: true, context: true, time: 8 }
+  };
 
-    const FILLERS = ["okay, ", "so, ", "um, ", "let me see, ", "right, "];
-    const CTX = {
-        phone: ["My number is ", "Call me at "],
-        price: ["That'll be ", "The total is ", "It costs "],
-        year: ["It was in ", "Back in "],
-        percent: ["About ", "Around "]
-    };
+  const FILLERS = ["okay, ", "so, ", "um, ", "let me see, ", "right, "];
+  const CTX = {
+    phone: ["My number is ", "Call me at "],
+    price: ["That'll be ", "The total is ", "It costs "],
+    year: ["It was in ", "Back in "],
+    percent: ["About ", "Around "]
+  };
 
-    // ========== STATE ==========
-    const S = { voiceState: 'LOCKED', screen: 'HOME', speaking: false, level: 1, mult: 1.0, offset: 1.0, session: null, current: null, input: '' };
+  // ========== STATE ==========
+  const S = { voiceState: 'LOCKED', screen: 'HOME', speaking: false, level: 1, mult: 1.0, offset: 1.0, session: null, current: null, input: '' };
 
-    // ========== STORAGE ==========
-    const Store = {
-        get(k, d) { try { const v = localStorage.getItem('nd_' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
-        set(k, v) { try { localStorage.setItem('nd_' + k, JSON.stringify(v)); } catch {} }
-    };
+  // ========== STORAGE ==========
+  const Store = {
+    get(k, d) { try { const v = localStorage.getItem('nd_' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem('nd_' + k, JSON.stringify(v)); } catch {} }
+  };
 
-    // ========== PHONETICS ==========
-    const Ph = {
-        o: ['zero','one','two','three','four','five','six','seven','eight','nine'],
-        t: ['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],
-        d: ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'],
-        w(n) { n = +n; if (n < 10) return this.o[n]; if (n < 20) return this.t[n - 10]; const a = n / 10 | 0, b = n % 10; return b ? this.d[a] + ' ' + this.o[b] : this.d[a]; },
-        h(n) { n = +n; if (n < 100) return this.w(n); const a = n / 100 | 0, b = n % 100; return b ? this.o[a] + ' hundred ' + this.w(b) : this.o[a] + ' hundred'; },
-        phone(d) {
-            if (d.length <= 4) return d.split('').map(x => this.o[+x]).join(', ');
-            if (d.length <= 7) return d.slice(0, 3).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(3).split('').map(x => this.o[+x]).join(' ');
-            return d.slice(0, 3).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(3, 6).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(6).split('').map(x => this.o[+x]).join(' ');
-        },
-        price(dol, cen) { let s = this.h(dol) + ' dollar' + (dol !== 1 ? 's' : ''); if (cen > 0) s += ' and ' + this.w(cen) + ' cent' + (cen !== 1 ? 's' : ''); return s; },
-        year(y) {
-            if (y >= 2000 && y <= 2009) return y === 2000 ? 'two thousand' : 'two thousand ' + this.o[y - 2000];
-            if (y >= 2010 && y <= 2019) return 'twenty ' + this.t[y - 2010];
-            if (y >= 2020) return 'twenty ' + this.w(y % 100);
-            const c = y / 100 | 0, r = y % 100;
-            if (r === 0) return this.w(c) + ' hundred';
-            if (r < 10) return this.w(c) + ' oh ' + this.o[r];
-            return this.w(c) + ' ' + this.w(r);
-        },
-        pct(v) { const p = String(v).split('.'); let s = this.w(+p[0]); if (p[1] && +p[1] > 0) s += ' point ' + p[1].split('').map(x => this.o[+x]).join(' '); return s + ' percent'; }
-    };
+  // ========== PHONETICS ==========
+  const Ph = {
+    o: ['zero','one','two','three','four','five','six','seven','eight','nine'],
+    t: ['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],
+    d: ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'],
+    w(n) { n = +n; if (n < 10) return this.o[n]; if (n < 20) return this.t[n - 10]; const a = n / 10 | 0, b = n % 10; return b ? this.d[a] + ' ' + this.o[b] : this.d[a]; },
+    h(n) { n = +n; if (n < 100) return this.w(n); const a = n / 100 | 0, b = n % 100; return b ? this.o[a] + ' hundred ' + this.w(b) : this.o[a] + ' hundred'; },
+    phone(d) {
+      if (d.length <= 4) return d.split('').map(x => this.o[+x]).join(', ');
+      if (d.length <= 7) return d.slice(0, 3).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(3).split('').map(x => this.o[+x]).join(' ');
+      return d.slice(0, 3).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(3, 6).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(6).split('').map(x => this.o[+x]).join(' ');
+    },
+    price(dol, cen) { let s = this.h(dol) + ' dollar' + (dol !== 1 ? 's' : ''); if (cen > 0) s += ' and ' + this.w(cen) + ' cent' + (cen !== 1 ? 's' : ''); return s; },
+    year(y) {
+      if (y >= 2000 && y <= 2009) return y === 2000 ? 'two thousand' : 'two thousand ' + this.o[y - 2000];
+      if (y >= 2010 && y <= 2019) return 'twenty ' + this.t[y - 2010];
+      if (y >= 2020) return 'twenty ' + this.w(y % 100);
+      const c = y / 100 | 0, r = y % 100;
+      if (r === 0) return this.w(c) + ' hundred';
+      if (r < 10) return this.w(c) + ' oh ' + this.o[r];
+      return this.w(c) + ' ' + this.w(r);
+    },
+    pct(v) { const p = String(v).split('.'); let s = this.w(+p[0]); if (p[1] && +p[1] > 0) s += ' point ' + p[1].split('').map(x => this.o[+x]).join(' '); return s + ' percent'; }
+  };
 
-    // ========== FACTORY ==========
-    const F = {
-        gen(lv, tp) {
-            const c = DIFF[lv];
-            tp = tp || ['phone', 'price', 'year', 'percent'][Math.random() * 4 | 0];
-            let q;
-            if (tp === 'phone') { let d = ''; for (let i = 0; i < c.phone; i++) d += Math.random() * 10 | 0; let disp = d; if (d.length === 7) disp = d.slice(0,3) + '-' + d.slice(3); else if (d.length === 10) disp = '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6); q = { raw: d, display: disp, spoken: Ph.phone(d) }; }
-            else if (tp === 'price') { const dol = (Math.random() * (c.price[1] - c.price[0]) | 0) + c.price[0]; const cen = c.price[2] ? Math.random() * 100 | 0 : 0; const raw = cen > 0 ? dol + '.' + String(cen).padStart(2, '0') : String(dol); q = { raw, display: '$' + raw, spoken: Ph.price(dol, cen) }; }
-            else if (tp === 'year') { const y = (Math.random() * (c.year[1] - c.year[0] + 1) | 0) + c.year[0]; q = { raw: String(y), display: String(y), spoken: Ph.year(y) }; }
-            else { let v; if (c.pct[1] && Math.random() > 0.5) v = (Math.random() * c.pct[0]).toFixed(1); else v = String((Math.random() * c.pct[0] | 0) + 1); q = { raw: v, display: v + '%', spoken: Ph.pct(v) }; }
-            q.type = tp; q.level = lv;
-            if (c.filler && Math.random() < 0.5) q.spoken = FILLERS[Math.random() * FILLERS.length | 0] + q.spoken;
-            if (c.context && Math.random() < 0.6) q.spoken = CTX[tp][Math.random() * CTX[tp].length | 0] + q.spoken;
-            return q;
+  // ========== FACTORY ==========
+  const F = {
+    gen(lv, tp) {
+      const c = DIFF[lv];
+      tp = tp || ['phone', 'price', 'year', 'percent'][Math.random() * 4 | 0];
+      let q;
+      if (tp === 'phone') { let d = ''; for (let i = 0; i < c.phone; i++) d += Math.random() * 10 | 0; let disp = d; if (d.length === 7) disp = d.slice(0,3) + '-' + d.slice(3); else if (d.length === 10) disp = '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6); q = { raw: d, display: disp, spoken: Ph.phone(d) }; }
+      else if (tp === 'price') { const dol = (Math.random() * (c.price[1] - c.price[0]) | 0) + c.price[0]; const cen = c.price[2] ? Math.random() * 100 | 0 : 0; const raw = cen > 0 ? dol + '.' + String(cen).padStart(2, '0') : String(dol); q = { raw, display: '$' + raw, spoken: Ph.price(dol, cen) }; }
+      else if (tp === 'year') { const y = (Math.random() * (c.year[1] - c.year[0] + 1) | 0) + c.year[0]; q = { raw: String(y), display: String(y), spoken: Ph.year(y) }; }
+      else { let v; if (c.pct[1] && Math.random() > 0.5) v = (Math.random() * c.pct[0]).toFixed(1); else v = String((Math.random() * c.pct[0] | 0) + 1); q = { raw: v, display: v + '%', spoken: Ph.pct(v) }; }
+      q.type = tp; q.level = lv;
+      if (c.filler && Math.random() < 0.5) q.spoken = FILLERS[Math.random() * FILLERS.length | 0] + q.spoken;
+      if (c.context && Math.random() < 0.6) q.spoken = CTX[tp][Math.random() * CTX[tp].length | 0] + q.spoken;
+      return q;
+    }
+  };
+
+  // ========== AUDIO ==========
+  const A = {
+    syn: window.speechSynthesis, voice: null,
+    init() {
+      return new Promise(r => {
+        const check = () => { const v = this.syn.getVoices(); if (v.length) { this.voice = v.find(x => x.lang === 'en-US') || v[0]; r(true); } else setTimeout(check, 100); };
+        this.syn.onvoiceschanged = check; check(); setTimeout(() => r(true), 2000);
+      });
+    },
+    unlock() { S.voiceState = 'UNLOCKING'; return this.init().then(() => this.speak('ready', 1, true)).then(ok => { S.voiceState = ok ? 'READY' : 'ERROR'; return ok; }); },
+    speak(text, rate, silent) {
+      return new Promise(r => {
+        try {
+          this.syn.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = 'en-US'; u.volume = silent ? 0.01 : 1;
+          if (this.voice) u.voice = this.voice;
+          u.rate = rate;
+          let done = false; const fin = ok => { if (!done) { done = true; r(ok); } };
+          u.onend = () => fin(true); u.onerror = () => fin(false); setTimeout(() => fin(false), 15000);
+          window.__u = u; this.syn.speak(u);
+        } catch { r(false); }
+      });
+    },
+    play(text, rate) {
+      if (S.voiceState !== 'READY' || S.speaking) return Promise.resolve(false);
+      S.speaking = true; UI.render();
+      return new Promise(r => setTimeout(r, 50)).then(() => this.speak(text, rate, false)).then(ok => { S.speaking = false; UI.render(); return ok; });
+    }
+  };
+
+  // ========== UI ==========
+  const UI = {
+    el: {},
+    init() {
+      this.el = {
+        home: document.getElementById('home-screen'),
+        train: document.getElementById('training-screen'),
+        levelList: document.getElementById('level-list'),
+        start: document.getElementById('start-btn'),
+        settings: document.getElementById('settings-link'),
+        acc: document.getElementById('hud-accuracy'),
+        time: document.getElementById('hud-time'),
+        bar: document.getElementById('time-bar'),
+        listen: document.getElementById('listen-btn'),
+        listenText: document.getElementById('listen-text'),
+        submit: document.getElementById('submit-btn'),
+        qType: document.getElementById('question-type'),
+        qLevel: document.getElementById('question-level'),
+        display: document.getElementById('main-display'),
+        fb: document.getElementById('feedback'),
+        keypad: document.getElementById('keypad'),
+        slider: document.getElementById('speed-slider'),
+        spdDisp: document.getElementById('speed-display'),
+        rateInfo: document.getElementById('final-rate-info')
+      };
+      this.load();
+    },
+    load() {
+      const p = Store.get('prefs', {});
+      S.mult = p.mult || 1.0;
+      S.offset = p.offset || 1.0;
+      S.level = p.level || 1;
+      this.updateLevelUI();
+      this.updateRate();
+    },
+    updateLevelUI() {
+      this.el.levelList.querySelectorAll('.level-item').forEach(item => {
+        item.classList.toggle('active', +item.dataset.level === S.level);
+      });
+    },
+    updateRate() {
+      const c = DIFF[S.level];
+      const r = (c.baseRate * S.mult * S.offset).toFixed(2);
+      if (this.el.rateInfo) {
+        this.el.rateInfo.textContent = c.baseRate.toFixed(2) + ' × ' + S.mult.toFixed(2) + ' = ' + r + '×';
+      }
+    },
+    show(n) {
+      this.el.home.classList.toggle('hidden', n !== 'HOME');
+      this.el.train.classList.toggle('hidden', n !== 'TRAIN');
+      S.screen = n;
+    },
+    modal(id, show) {
+      document.getElementById(id).classList.toggle('active', show);
+    },
+    render() {
+      const sess = S.session, curr = S.current;
+      
+      // HUD
+      if (sess && sess.att.length) {
+        this.el.acc.textContent = (sess.ok / sess.att.length * 100 | 0) + '%';
+        this.el.time.textContent = (sess.att.reduce((a, b) => a + b.t, 0) / sess.att.length / 1000).toFixed(1) + 's';
+      }
+      
+      // Level info
+      const c = DIFF[S.level];
+      this.el.qLevel.textContent = c.name;
+      
+      // Main display
+      if (curr) {
+        this.el.qType.textContent = curr.type.toUpperCase();
+        const d = this.el.display;
+        d.classList.remove('listening', 'correct', 'wrong');
+        
+        if (S.speaking) {
+          d.classList.add('listening');
+          d.innerHTML = '<span class="listening-icon">♪</span>';
+        } else if (curr.done) {
+          d.classList.add(curr.ok ? 'correct' : 'wrong');
+          d.textContent = curr.ok ? S.input : S.input || '—';
+          this.el.fb.innerHTML = curr.ok 
+            ? '<div class="feedback-text correct">Correct</div>'
+            : '<div class="feedback-text wrong">Incorrect</div><div class="feedback-answer">Answer: <span class="correct-val">' + curr.display + '</span></div>';
+        } else if (curr.heard) {
+          d.innerHTML = S.input ? S.input + '<span class="cursor"></span>' : '<span class="cursor"></span>';
+          this.el.fb.innerHTML = '';
+        } else {
+          d.textContent = 'Press Listen';
+          this.el.fb.innerHTML = '';
         }
-    };
-
-    // ========== AUDIO ==========
-    const A = {
-        syn: window.speechSynthesis, voice: null,
-        init() {
-            return new Promise(r => {
-                const check = () => { const v = this.syn.getVoices(); if (v.length) { this.voice = v.find(x => x.lang === 'en-US') || v[0]; console.log('[Audio] Voice:', this.voice?.name); r(true); } else setTimeout(check, 100); };
-                this.syn.onvoiceschanged = check; check(); setTimeout(() => r(true), 2000);
-            });
-        },
-        unlock() { S.voiceState = 'UNLOCKING'; return this.init().then(() => this.speak('ready', 1, true)).then(ok => { S.voiceState = ok ? 'READY' : 'ERROR'; return ok; }); },
-        speak(text, rate, silent) {
-            return new Promise(r => {
-                try {
-                    this.syn.cancel();
-                    const u = new SpeechSynthesisUtterance(text);
-                    u.lang = 'en-US'; u.volume = silent ? 0.01 : 1;
-                    if (this.voice) u.voice = this.voice;
-                    u.rate = rate;
-                    console.log('[Audio] Rate:', rate, 'Text:', text.slice(0, 40));
-                    let done = false; const fin = ok => { if (!done) { done = true; r(ok); } };
-                    u.onend = () => fin(true); u.onerror = () => fin(false); setTimeout(() => fin(false), 15000);
-                    window.__u = u; this.syn.speak(u);
-                } catch { r(false); }
-            });
-        },
-        play(text, rate) {
-            if (S.voiceState !== 'READY' || S.speaking) return Promise.resolve(false);
-            S.speaking = true; UI.render();
-            return new Promise(r => setTimeout(r, 50)).then(() => this.speak(text, rate, false)).then(ok => { S.speaking = false; UI.render(); return ok; });
-        }
-    };
-
-    // ========== UI ==========
-    const UI = {
-        el: {}, idx: 1,
-        init() {
-            this.el = {
-                home: document.getElementById('home-screen'),
-                train: document.getElementById('training-screen'),
-                score: document.getElementById('total-score'),
-                streak: document.getElementById('best-streak'),
-                container: document.getElementById('carousel-container'),
-                track: document.getElementById('carousel-track'),
-                nav: document.getElementById('carousel-nav'),
-                prev: document.getElementById('prev-btn'),
-                next: document.getElementById('next-level-btn'),
-                dots: document.getElementById('mastery-dots'),
-                start: document.getElementById('start-btn'),
-                acc: document.getElementById('hud-accuracy'),
-                time: document.getElementById('hud-time'),
-                bar: document.getElementById('time-bar'),
-                listen: document.getElementById('listen-btn'),
-                replay: document.getElementById('replay-btn'),
-                nextQ: document.getElementById('next-btn'),
-                submit: document.getElementById('submit-btn'),
-                sInd: document.getElementById('streak-indicator'),
-                sCount: document.getElementById('streak-count'),
-                qType: document.getElementById('question-type'),
-                qLevel: document.getElementById('question-level'),
-                spdInd: document.getElementById('speed-indicator'),
-                display: document.getElementById('main-display'),
-                fb: document.getElementById('feedback'),
-                keypad: document.getElementById('keypad'),
-                slider: document.getElementById('speed-slider'),
-                spdDisp: document.getElementById('speed-display'),
-                rateInfo: document.getElementById('final-rate-info')
-            };
-            this.buildNav(); this.buildDots(); this.load();
-        },
-        buildNav() { this.el.nav.innerHTML = ''; for (let i = 1; i <= 5; i++) { const d = document.createElement('button'); d.className = 'carousel-dot' + (i === this.idx ? ' active' : ''); d.dataset.level = i; this.el.nav.appendChild(d); } },
-        goTo(lv) {
-            lv = Math.max(1, Math.min(5, lv)); this.idx = lv; S.level = lv;
-            const p = Store.get('prefs', {}); p.level = lv; Store.set('prefs', p);
-            this.el.track.style.transform = 'translateX(-' + ((lv - 1) * 100) + '%)';
-            document.querySelectorAll('.identity-card').forEach((c, i) => c.classList.toggle('active', i === lv - 1));
-            document.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === lv - 1));
-            this.el.prev.disabled = lv === 1; this.el.next.disabled = lv === 5;
-            this.updateRate(); console.log('[UI] Level:', lv, DIFF[lv].name);
-        },
-        buildDots() { this.el.dots.innerHTML = ''; const s = Store.get('sessions', []).slice(0, 20); for (let i = 0; i < 20; i++) { const d = document.createElement('div'); d.className = 'mastery-dot'; if (s[i]) { const a = s[i].acc; if (a >= 0.95) d.classList.add('perfect'); else if (a >= 0.8) d.classList.add('high'); else if (a >= 0.6) d.classList.add('medium'); else d.classList.add('low'); } this.el.dots.appendChild(d); } },
-        load() { const p = Store.get('prefs', {}); this.el.score.textContent = p.score || 0; this.el.streak.textContent = p.streak || 0; S.mult = p.mult || 1.0; S.offset = p.offset || 1.0; this.goTo(p.level || 1); },
-        updateRate() { const c = DIFF[S.level]; const r = (c.baseRate * S.mult * S.offset).toFixed(2); if (this.el.rateInfo) this.el.rateInfo.textContent = c.baseRate.toFixed(2) + ' × ' + S.mult.toFixed(2) + ' = ' + r + 'x'; },
-        show(n) { this.el.home.classList.toggle('hidden', n !== 'HOME'); this.el.train.classList.toggle('hidden', n !== 'TRAIN'); S.screen = n; },
-        modal(id, show) { document.getElementById(id).classList.toggle('active', show); },
-        render() {
-            const sess = S.session, curr = S.current;
-            if (sess && sess.att.length) { this.el.acc.textContent = (sess.ok / sess.att.length * 100 | 0) + '%'; this.el.time.textContent = (sess.att.reduce((a, b) => a + b.t, 0) / sess.att.length / 1000).toFixed(1) + 's'; }
-            const c = DIFF[S.level]; this.el.qLevel.textContent = c.name; this.el.spdInd.textContent = (c.baseRate * S.mult * S.offset).toFixed(2) + 'x';
-            if (sess && sess.streak >= 3) { this.el.sInd.classList.add('active'); this.el.sCount.textContent = sess.streak; } else this.el.sInd.classList.remove('active');
-            if (curr) {
-                this.el.qType.textContent = curr.type.toUpperCase();
-                const d = this.el.display; d.classList.remove('listening', 'correct', 'wrong');
-                if (S.speaking) { d.classList.add('listening'); d.innerHTML = '<span class="listening-icon">🎧</span>'; }
-                else if (curr.done) { d.classList.add(curr.ok ? 'correct' : 'wrong'); d.innerHTML = curr.ok ? '✓ ' + S.input : '<span class="animate-shake">' + (S.input || '—') + '</span>'; this.el.fb.innerHTML = curr.ok ? '<div class="feedback-text correct">Correct!</div>' : '<div class="feedback-text wrong">Incorrect</div><div class="feedback-answer">Answer: ' + curr.display + '</div>'; }
-                else if (curr.heard) { d.innerHTML = S.input ? S.input + '<span class="cursor"></span>' : '<span class="cursor"></span>'; this.el.fb.innerHTML = ''; }
-                else { d.innerHTML = 'Press Listen'; this.el.fb.innerHTML = ''; }
-            } else { this.el.display.innerHTML = 'Press Listen to start'; this.el.fb.innerHTML = ''; }
-            this.el.listen.disabled = !(S.voiceState === 'READY' && !S.speaking && (!curr || !curr.done));
-            this.el.replay.disabled = !(S.voiceState === 'READY' && !S.speaking && curr && curr.heard && !curr.done);
-            this.el.submit.disabled = !(!S.speaking && curr && curr.heard && !curr.done && S.input.length);
-            this.el.nextQ.disabled = !(curr && curr.done && !S.speaking);
-            this.el.keypad.querySelectorAll('.key').forEach(k => { k.disabled = S.speaking || (curr && curr.done); });
-            this.el.spdDisp.textContent = S.mult.toFixed(2) + 'x'; this.el.slider.value = S.mult; this.updateRate();
-        },
-        summary() {
-            const sess = S.session, acc = sess.att.length ? (sess.ok / sess.att.length * 100 | 0) : 0;
-            document.getElementById('summary-accuracy').textContent = acc + '%';
-            document.getElementById('summary-streak').textContent = sess.best;
-            document.getElementById('summary-time').textContent = sess.att.length ? (sess.att.reduce((a, b) => a + b.t, 0) / sess.att.length / 1000).toFixed(1) + 's' : '-';
-            document.getElementById('summary-count').textContent = sess.att.length;
-            const list = document.getElementById('mistakes-list'); list.innerHTML = '';
-            if (sess.mis.length) { document.getElementById('mistakes-section').classList.remove('hidden'); sess.mis.slice(0, 5).forEach(m => { const div = document.createElement('div'); div.className = 'mistake-item'; div.innerHTML = '<div>' + m.display + ' (' + m.type + ')</div><span>→ ' + (m.userInput || '—') + '</span>'; list.appendChild(div); }); }
-            else document.getElementById('mistakes-section').classList.add('hidden');
-            this.modal('summary-modal', true);
-        }
-    };
-
-    // ========== APP ==========
-    const App = {
-        timer: null,
-        start() {
-            UI.el.start.disabled = true; UI.el.start.textContent = 'Initializing...';
-            const p = Store.get('prefs', {}); S.mult = p.mult || 1.0; S.offset = p.offset || 1.0;
-            // 【关键修复】不覆盖S.level，使用UI已选择的level
-            console.log('[App] Start - Level:', S.level, DIFF[S.level].name, 'Rate:', this.rate());
-            A.unlock().then(ok => { if (ok) { if (!p.calibrated) UI.modal('calibration-modal', true); else this.begin(); } else { UI.el.start.disabled = false; UI.el.start.textContent = 'Retry'; } });
-        },
-        begin() { S.session = { att: [], ok: 0, streak: 0, best: 0, mis: [] }; S.current = null; S.input = ''; UI.show('TRAIN'); UI.render(); },
-        rate() { return DIFF[S.level].baseRate * S.mult * S.offset; },
-        listen() {
-            if (S.speaking || S.voiceState !== 'READY') return;
-            const q = F.gen(S.level); q.heard = false; q.done = false; q.ok = null;
-            S.current = q; S.input = ''; UI.render();
-            console.log('[App] Q:', q.type, q.display, '| Spoken:', q.spoken, '| Rate:', this.rate());
-            A.play(q.spoken, this.rate()).then(ok => { if (ok) { q.heard = true; q.at = Date.now(); const c = DIFF[S.level]; if (c.time) this.startTimer(c.time); } UI.render(); });
-        },
-        replay() { const q = S.current; if (!q || q.done || S.speaking) return; A.play(q.spoken, this.rate()); },
-        input(v) { if (S.speaking || !S.current || S.current.done) return; if (v === 'del') S.input = S.input.slice(0, -1); else if (v === '.' && !S.input.includes('.')) S.input += v; else if (v !== '.' && S.input.length < 15) S.input += v; UI.render(); },
-        submit() {
-            const q = S.current; if (!q || q.done || !S.input.length) return;
-            this.clearTimer();
-            let a = S.input.replace(/[^0-9.]/g, ''), b = q.raw.replace(/[^0-9.]/g, '');
-            const ok = (q.type === 'price' || q.type === 'percent') ? parseFloat(a) === parseFloat(b) : a === b;
-            q.done = true; q.ok = ok; q.userInput = S.input;
-            S.session.att.push({ ok, t: Date.now() - q.at, type: q.type });
-            if (ok) { S.session.ok++; S.session.streak++; S.session.best = Math.max(S.session.best, S.session.streak); }
-            else { S.session.streak = 0; S.session.mis.push(q); }
-            UI.render();
-        },
-        next() { if (!S.current || !S.current.done) return; S.current = null; S.input = ''; UI.render(); this.listen(); },
-        startTimer(sec) { this.clearTimer(); const b = UI.el.bar; b.style.width = '100%'; b.style.transition = 'none'; requestAnimationFrame(() => { b.style.transition = 'width ' + sec + 's linear'; b.style.width = '0%'; }); this.timer = setTimeout(() => { if (S.current && !S.current.done) this.submit(); }, sec * 1000); },
-        clearTimer() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } UI.el.bar.style.transition = 'none'; UI.el.bar.style.width = '100%'; },
-        exit() {
-            this.clearTimer(); A.syn.cancel(); S.speaking = false;
-            const sess = S.session;
-            if (sess && sess.att.length) {
-                const acc = sess.ok / sess.att.length;
-                const s = Store.get('sessions', []); s.unshift({ acc, count: sess.att.length, level: S.level, ts: Date.now() }); if (s.length > 20) s.pop(); Store.set('sessions', s);
-                const p = Store.get('prefs', {}); p.score = (p.score || 0) + sess.ok * 10; p.streak = Math.max(p.streak || 0, sess.best); p.level = S.level; p.mult = S.mult; Store.set('prefs', p);
-                UI.summary();
-            } else this.home();
-        },
-        closeSummary() { UI.modal('summary-modal', false); this.home(); },
-        home() { UI.show('HOME'); UI.load(); UI.buildDots(); UI.el.start.disabled = false; UI.el.start.textContent = 'Start Training'; },
-        // 【关键修复】速度调整立即保存
-        updateSpeed() { S.mult = parseFloat(UI.el.slider.value); const p = Store.get('prefs', {}); p.mult = S.mult; Store.set('prefs', p); console.log('[App] Speed:', S.mult, '→ Rate:', this.rate()); UI.render(); },
-        preview() { if (S.speaking) return; A.play('The total is forty five dollars and ninety nine cents', this.rate()); },
-        playCalib(s) { if (S.speaking) return; S.speaking = true; A.speak('The total is forty five dollars', s === 'A' ? 1.0 : 0.7, false).then(() => { S.speaking = false; }); },
-        selectCalib(c) { S.offset = c === 'A' ? 1.0 : 0.85; const p = Store.get('prefs', {}); p.offset = S.offset; p.calibrated = true; Store.set('prefs', p); UI.modal('calibration-modal', false); this.begin(); }
-    };
-
-    // ========== EVENTS ==========
-    document.addEventListener('DOMContentLoaded', () => {
-        UI.init();
-        UI.el.start.addEventListener('click', () => App.start());
-        UI.el.keypad.addEventListener('click', e => { const k = e.target.closest('.key'); if (k && !k.disabled) App.input(k.dataset.val); });
-        document.getElementById('listen-btn').addEventListener('click', () => App.listen());
-        document.getElementById('replay-btn').addEventListener('click', () => App.replay());
-        document.getElementById('next-btn').addEventListener('click', () => App.next());
-        document.getElementById('submit-btn').addEventListener('click', () => App.submit());
-        document.getElementById('speed-btn').addEventListener('click', () => UI.modal('speed-modal', true));
-        document.getElementById('exit-btn').addEventListener('click', () => App.exit());
-        document.getElementById('speed-slider').addEventListener('input', () => App.updateSpeed());
-        document.getElementById('preview-btn').addEventListener('click', () => App.preview());
-        document.getElementById('close-speed-modal').addEventListener('click', () => UI.modal('speed-modal', false));
-        document.getElementById('close-summary-modal').addEventListener('click', () => App.closeSummary());
-        document.getElementById('close-calib-modal').addEventListener('click', () => UI.modal('calibration-modal', false));
-        document.getElementById('practice-mistakes-btn').addEventListener('click', () => { UI.modal('summary-modal', false); App.begin(); });
-        document.getElementById('back-home-btn').addEventListener('click', () => App.closeSummary());
-        document.getElementById('sample-a-btn').addEventListener('click', () => App.playCalib('A'));
-        document.getElementById('sample-b-btn').addEventListener('click', () => App.playCalib('B'));
-        document.getElementById('select-a-btn').addEventListener('click', () => App.selectCalib('A'));
-        document.getElementById('select-b-btn').addEventListener('click', () => App.selectCalib('B'));
-
-        // 箭头导航
-        UI.el.prev.addEventListener('click', () => UI.goTo(UI.idx - 1));
-        UI.el.next.addEventListener('click', () => UI.goTo(UI.idx + 1));
-        UI.el.nav.addEventListener('click', e => { const d = e.target.closest('.carousel-dot'); if (d) UI.goTo(+d.dataset.level); });
-
-        // 【修复】滑动 - 绑定到Container
-        let sx = 0, sy = 0, drag = false;
-        UI.el.container.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; drag = true; });
-        document.addEventListener('pointerup', e => { if (!drag) return; drag = false; const dx = sx - e.clientX, dy = sy - e.clientY; if (Math.abs(dx) > 50 && Math.abs(dy) < 50) UI.goTo(UI.idx + (dx > 0 ? 1 : -1)); });
-        UI.el.container.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
-        UI.el.container.addEventListener('touchend', e => { const dx = sx - e.changedTouches[0].clientX, dy = sy - e.changedTouches[0].clientY; if (Math.abs(dx) > 50 && Math.abs(dy) < 50) UI.goTo(UI.idx + (dx > 0 ? 1 : -1)); }, { passive: true });
-        let wt = null;
-        UI.el.container.addEventListener('wheel', e => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 30) { e.preventDefault(); if (wt) return; wt = setTimeout(() => { wt = null; }, 300); UI.goTo(UI.idx + (e.deltaX > 0 ? 1 : -1)); } }, { passive: false });
-
-        // 键盘
-        document.addEventListener('keydown', e => {
-            if (S.screen === 'HOME') { if (e.key === 'ArrowLeft') UI.goTo(UI.idx - 1); if (e.key === 'ArrowRight') UI.goTo(UI.idx + 1); if (e.key === 'Enter') App.start(); return; }
-            if (S.screen !== 'TRAIN') return;
-            if (e.key >= '0' && e.key <= '9') App.input(e.key);
-            else if (e.key === '.') App.input('.');
-            else if (e.key === 'Backspace') App.input('del');
-            else if (e.key === 'Enter') { if (S.current && S.current.done) App.next(); else App.submit(); }
+      } else {
+        this.el.display.textContent = 'Press Listen';
+        this.el.fb.innerHTML = '';
+      }
+      
+      // Listen button text
+      if (curr && curr.heard && !curr.done) {
+        this.el.listenText.textContent = 'Replay';
+      } else if (curr && curr.done) {
+        this.el.listenText.textContent = 'Next';
+      } else {
+        this.el.listenText.textContent = 'Listen';
+      }
+      
+      // Button states
+      const canListen = S.voiceState === 'READY' && !S.speaking;
+      this.el.listen.disabled = !canListen;
+      this.el.submit.disabled = !(!S.speaking && curr && curr.heard && !curr.done && S.input.length);
+      this.el.keypad.querySelectorAll('.key').forEach(k => {
+        k.disabled = S.speaking || (curr && curr.done);
+      });
+      
+      // Speed display
+      this.el.spdDisp.textContent = S.mult.toFixed(2) + '×';
+      this.el.slider.value = S.mult;
+      this.updateRate();
+    },
+    summary() {
+      const sess = S.session;
+      const acc = sess.att.length ? (sess.ok / sess.att.length * 100 | 0) : 0;
+      
+      document.getElementById('summary-accuracy').textContent = acc + '%';
+      document.getElementById('summary-time').textContent = sess.att.length 
+        ? (sess.att.reduce((a, b) => a + b.t, 0) / sess.att.length / 1000).toFixed(1) + 's' 
+        : '-';
+      
+      const list = document.getElementById('mistakes-list');
+      list.innerHTML = '';
+      
+      if (sess.mis.length) {
+        document.getElementById('mistakes-section').classList.remove('hidden');
+        sess.mis.slice(0, 5).forEach(m => {
+          const div = document.createElement('div');
+          div.className = 'mistake-item';
+          div.innerHTML = '<span class="correct-answer">' + m.display + '</span><span class="user-answer">' + (m.userInput || '—') + '</span>';
+          list.appendChild(div);
         });
-        document.addEventListener('visibilitychange', () => { if (document.hidden) { A.syn.cancel(); S.speaking = false; App.clearTimer(); } });
-        A.init();
+      } else {
+        document.getElementById('mistakes-section').classList.add('hidden');
+      }
+      
+      this.modal('summary-modal', true);
+    }
+  };
+
+  // ========== APP ==========
+  const App = {
+    timer: null,
+    start() {
+      UI.el.start.disabled = true;
+      UI.el.start.textContent = 'Loading...';
+      const p = Store.get('prefs', {});
+      S.mult = p.mult || 1.0;
+      S.offset = p.offset || 1.0;
+      
+      A.unlock().then(ok => {
+        if (ok) {
+          if (!p.calibrated) {
+            UI.modal('calibration-modal', true);
+          } else {
+            this.begin();
+          }
+        } else {
+          UI.el.start.disabled = false;
+          UI.el.start.textContent = 'Retry';
+        }
+      });
+    },
+    begin() {
+      S.session = { att: [], ok: 0, streak: 0, best: 0, mis: [] };
+      S.current = null;
+      S.input = '';
+      UI.show('TRAIN');
+      UI.render();
+    },
+    rate() {
+      return DIFF[S.level].baseRate * S.mult * S.offset;
+    },
+    handleListen() {
+      const curr = S.current;
+      
+      // Next question after completion
+      if (curr && curr.done) {
+        this.next();
+        return;
+      }
+      
+      // Replay
+      if (curr && curr.heard && !curr.done) {
+        this.replay();
+        return;
+      }
+      
+      // New question
+      this.listen();
+    },
+    listen() {
+      if (S.speaking || S.voiceState !== 'READY') return;
+      
+      const q = F.gen(S.level);
+      q.heard = false;
+      q.done = false;
+      q.ok = null;
+      S.current = q;
+      S.input = '';
+      UI.render();
+      
+      A.play(q.spoken, this.rate()).then(ok => {
+        if (ok) {
+          q.heard = true;
+          q.at = Date.now();
+          const c = DIFF[S.level];
+          if (c.time) this.startTimer(c.time);
+        }
+        UI.render();
+      });
+    },
+    replay() {
+      const q = S.current;
+      if (!q || q.done || S.speaking) return;
+      A.play(q.spoken, this.rate());
+    },
+    next() {
+      if (!S.current || !S.current.done) return;
+      S.current = null;
+      S.input = '';
+      UI.render();
+      this.listen();
+    },
+    input(v) {
+      if (S.speaking || !S.current || S.current.done) return;
+      if (v === 'del') {
+        S.input = S.input.slice(0, -1);
+      } else if (v === '.' && !S.input.includes('.')) {
+        S.input += v;
+      } else if (v !== '.' && S.input.length < 15) {
+        S.input += v;
+      }
+      UI.render();
+    },
+    submit() {
+      const q = S.current;
+      if (!q || q.done || !S.input.length) return;
+      
+      this.clearTimer();
+      
+      let a = S.input.replace(/[^0-9.]/g, '');
+      let b = q.raw.replace(/[^0-9.]/g, '');
+      const ok = (q.type === 'price' || q.type === 'percent') ? parseFloat(a) === parseFloat(b) : a === b;
+      
+      q.done = true;
+      q.ok = ok;
+      q.userInput = S.input;
+      
+      S.session.att.push({ ok, t: Date.now() - q.at, type: q.type });
+      
+      if (ok) {
+        S.session.ok++;
+        S.session.streak++;
+        S.session.best = Math.max(S.session.best, S.session.streak);
+      } else {
+        S.session.streak = 0;
+        S.session.mis.push(q);
+      }
+      
+      UI.render();
+    },
+    startTimer(sec) {
+      this.clearTimer();
+      const b = UI.el.bar;
+      b.style.width = '100%';
+      b.style.transition = 'none';
+      requestAnimationFrame(() => {
+        b.style.transition = 'width ' + sec + 's linear';
+        b.style.width = '0%';
+      });
+      this.timer = setTimeout(() => {
+        if (S.current && !S.current.done) this.submit();
+      }, sec * 1000);
+    },
+    clearTimer() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
+      UI.el.bar.style.transition = 'none';
+      UI.el.bar.style.width = '100%';
+    },
+    exit() {
+      this.clearTimer();
+      A.syn.cancel();
+      S.speaking = false;
+      
+      const sess = S.session;
+      if (sess && sess.att.length) {
+        const acc = sess.ok / sess.att.length;
+        const s = Store.get('sessions', []);
+        s.unshift({ acc, count: sess.att.length, level: S.level, ts: Date.now() });
+        if (s.length > 20) s.pop();
+        Store.set('sessions', s);
+        
+        const p = Store.get('prefs', {});
+        p.level = S.level;
+        p.mult = S.mult;
+        Store.set('prefs', p);
+        
+        UI.summary();
+      } else {
+        this.home();
+      }
+    },
+    closeSummary() {
+      UI.modal('summary-modal', false);
+      this.home();
+    },
+    home() {
+      UI.show('HOME');
+      UI.load();
+      UI.el.start.disabled = false;
+      UI.el.start.textContent = 'Begin';
+    },
+    updateSpeed() {
+      S.mult = parseFloat(UI.el.slider.value);
+      const p = Store.get('prefs', {});
+      p.mult = S.mult;
+      Store.set('prefs', p);
+      UI.render();
+    },
+    preview() {
+      if (S.speaking) return;
+      A.play('The total is forty five dollars and ninety nine cents', this.rate());
+    },
+    playCalib(s) {
+      if (S.speaking) return;
+      S.speaking = true;
+      A.speak('The total is forty five dollars', s === 'A' ? 1.0 : 0.7, false).then(() => {
+        S.speaking = false;
+      });
+    },
+    selectCalib(c) {
+      S.offset = c === 'A' ? 1.0 : 0.85;
+      const p = Store.get('prefs', {});
+      p.offset = S.offset;
+      p.calibrated = true;
+      Store.set('prefs', p);
+      UI.modal('calibration-modal', false);
+      this.begin();
+    },
+    selectLevel(lv) {
+      S.level = lv;
+      const p = Store.get('prefs', {});
+      p.level = lv;
+      Store.set('prefs', p);
+      UI.updateLevelUI();
+      UI.updateRate();
+    }
+  };
+
+  // ========== EVENTS ==========
+  document.addEventListener('DOMContentLoaded', () => {
+    UI.init();
+    
+    // Home
+    UI.el.start.addEventListener('click', () => App.start());
+    UI.el.settings.addEventListener('click', () => UI.modal('speed-modal', true));
+    UI.el.levelList.addEventListener('click', e => {
+      const item = e.target.closest('.level-item');
+      if (item) App.selectLevel(+item.dataset.level);
     });
+    
+    // Training
+    UI.el.listen.addEventListener('click', () => App.handleListen());
+    document.getElementById('submit-btn').addEventListener('click', () => App.submit());
+    document.getElementById('exit-btn').addEventListener('click', () => App.exit());
+    UI.el.keypad.addEventListener('click', e => {
+      const k = e.target.closest('.key');
+      if (k && !k.disabled) App.input(k.dataset.val);
+    });
+    
+    // Speed modal
+    document.getElementById('speed-slider').addEventListener('input', () => App.updateSpeed());
+    document.getElementById('preview-btn').addEventListener('click', () => App.preview());
+    document.getElementById('close-speed-modal').addEventListener('click', () => UI.modal('speed-modal', false));
+    
+    // Summary modal
+    document.getElementById('continue-btn').addEventListener('click', () => { UI.modal('summary-modal', false); App.begin(); });
+    document.getElementById('back-home-btn').addEventListener('click', () => App.closeSummary());
+    
+    // Calibration modal
+    document.getElementById('close-calib-modal').addEventListener('click', () => UI.modal('calibration-modal', false));
+    document.getElementById('sample-a-btn').addEventListener('click', () => App.playCalib('A'));
+    document.getElementById('sample-b-btn').addEventListener('click', () => App.playCalib('B'));
+    document.getElementById('select-a-btn').addEventListener('click', () => App.selectCalib('A'));
+    document.getElementById('select-b-btn').addEventListener('click', () => App.selectCalib('B'));
+    
+    // Keyboard
+    document.addEventListener('keydown', e => {
+      if (S.screen === 'HOME') {
+        if (e.key === 'Enter') App.start();
+        return;
+      }
+      if (S.screen !== 'TRAIN') return;
+      
+      if (e.key >= '0' && e.key <= '9') App.input(e.key);
+      else if (e.key === '.') App.input('.');
+      else if (e.key === 'Backspace') App.input('del');
+      else if (e.key === 'Enter') {
+        if (S.current && S.current.done) App.next();
+        else App.submit();
+      }
+      else if (e.key === ' ') {
+        e.preventDefault();
+        App.handleListen();
+      }
+    });
+    
+    // Visibility
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        A.syn.cancel();
+        S.speaking = false;
+        App.clearTimer();
+      }
+    });
+    
+    A.init();
+  });
 })();
 </script>
 </body>
