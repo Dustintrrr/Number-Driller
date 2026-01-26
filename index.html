@@ -678,6 +678,60 @@
       text-align: center;
       margin-top: var(--space-md);
     }
+    
+    /* ========== ACCENT SELECTION ========== */
+    .settings-section {
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .settings-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .accent-options {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    
+    .accent-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: var(--space-sm);
+      background: var(--bg-secondary);
+      border: 1px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .accent-btn:hover {
+      border-color: var(--border-strong);
+    }
+    
+    .accent-btn.active {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+    
+    .accent-flag {
+      font-size: 1.2rem;
+    }
+    
+    .accent-name {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+    
+    .accent-btn.active .accent-name {
+      color: var(--text-primary);
+    }
 
     /* ========== SUMMARY ========== */
     .summary-title {
@@ -752,6 +806,26 @@
     .mistake-item .user-answer {
       color: var(--error);
       text-decoration: line-through;
+    }
+    
+    .mistakes-more {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      text-align: center;
+      padding: var(--space-xs);
+    }
+    
+    /* Review Mode 指示器 */
+    .review-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 0.7rem;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: var(--space-sm);
     }
     
     /* 操作按钮 */
@@ -850,6 +924,28 @@
     
     .choice-btn:hover {
       background: var(--text-secondary);
+    }
+    
+    .choice-btn.secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    
+    .choice-btn.secondary:hover {
+      border-color: var(--text-secondary);
+      background: var(--accent-light);
+    }
+    
+    .sample-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+    }
+    
+    .sample-icon {
+      font-size: 1rem;
     }
 
     /* ========== UTILITIES ========== */
@@ -979,12 +1075,33 @@
   <div id="speed-modal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Speed</h2>
+        <h2>Settings</h2>
         <button class="modal-close" id="close-speed-modal">×</button>
       </div>
+      
+      <!-- 口音选择 -->
+      <div class="settings-section">
+        <div class="settings-label">Accent</div>
+        <div class="accent-options" id="accent-options">
+          <button class="accent-btn active" data-accent="en-US">
+            <span class="accent-flag">🇺🇸</span>
+            <span class="accent-name">American</span>
+          </button>
+          <button class="accent-btn" data-accent="en-GB">
+            <span class="accent-flag">🇬🇧</span>
+            <span class="accent-name">British</span>
+          </button>
+          <button class="accent-btn" data-accent="en-AU">
+            <span class="accent-flag">🇦🇺</span>
+            <span class="accent-name">Australian</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 语速控制 -->
       <div class="speed-control">
         <div class="speed-label">
-          <span>Multiplier</span>
+          <span>Speed Multiplier</span>
           <span class="speed-value" id="speed-display">1.0×</span>
         </div>
         <input type="range" class="speed-slider" id="speed-slider" min="0.5" max="1.5" step="0.05" value="1.0">
@@ -994,7 +1111,9 @@
           <span>1.5×</span>
         </div>
       </div>
-      <button class="preview-btn" id="preview-btn">Preview Speed</button>
+      
+      <button class="preview-btn" id="preview-btn">Preview</button>
+      
       <p class="rate-info">
         Final = Base × Multiplier<br>
         <span id="final-rate-info">0.60 × 1.00 = 0.60×</span>
@@ -1038,17 +1157,35 @@
         <button class="modal-close" id="close-calib-modal">×</button>
       </div>
       <div class="calibration-content">
-        <h3>Listen to both samples</h3>
-        <p>Which sounds like normal speaking speed?</p>
+        <h3>Find Your Comfortable Speed</h3>
+        <p>Listen to each sample and select the one that feels like natural conversation.</p>
         
         <div class="calibration-samples">
-          <button class="sample-btn" id="sample-a-btn">♪ Sample A (faster)</button>
-          <button class="sample-btn" id="sample-b-btn">♪ Sample B (slower)</button>
+          <button class="sample-btn" id="sample-0-btn">
+            <span class="sample-icon">♪</span>
+            <span>Fast (1.0×)</span>
+          </button>
+          <button class="sample-btn" id="sample-1-btn">
+            <span class="sample-icon">♪</span>
+            <span>Normal (0.9×)</span>
+          </button>
+          <button class="sample-btn" id="sample-2-btn">
+            <span class="sample-icon">♪</span>
+            <span>Moderate (0.8×)</span>
+          </button>
+          <button class="sample-btn" id="sample-3-btn">
+            <span class="sample-icon">♪</span>
+            <span>Slow (0.7×)</span>
+          </button>
         </div>
         
         <div class="calibration-choices">
-          <button class="choice-btn" id="select-a-btn">A is Normal</button>
-          <button class="choice-btn" id="select-b-btn">B is Normal</button>
+          <button class="choice-btn" id="select-0-btn">Use Fast</button>
+          <button class="choice-btn" id="select-1-btn">Use Normal</button>
+        </div>
+        <div class="calibration-choices" style="margin-top: var(--space-xs);">
+          <button class="choice-btn secondary" id="select-2-btn">Use Moderate</button>
+          <button class="choice-btn secondary" id="select-3-btn">Use Slow</button>
         </div>
       </div>
     </div>
@@ -1076,7 +1213,28 @@
   };
 
   // ========== STATE ==========
-  const S = { voiceState: 'LOCKED', screen: 'HOME', speaking: false, level: 1, mult: 1.0, offset: 1.0, session: null, current: null, input: '' };
+  const S = { 
+    voiceState: 'LOCKED', 
+    screen: 'HOME', 
+    speaking: false, 
+    level: 1, 
+    mult: 1.0, 
+    offset: 1.0, 
+    session: null, 
+    current: null, 
+    input: '',
+    reviewQueue: [],      // 错题重练队列
+    reviewMode: false,    // 是否处于错题重练模式
+    accent: 'en-US',      // 口音选择: en-US / en-GB / en-AU
+    recentHistory: []     // 精确滑动窗口：最近30题记录 [{type, ok}]
+  };
+  
+  // 口音配置
+  const ACCENTS = {
+    'en-US': { name: 'American', lang: 'en-US', flag: '🇺🇸' },
+    'en-GB': { name: 'British', lang: 'en-GB', flag: '🇬🇧' },
+    'en-AU': { name: 'Australian', lang: 'en-AU', flag: '🇦🇺' }
+  };
 
   // ========== STORAGE ==========
   const Store = {
@@ -1084,20 +1242,128 @@
     set(k, v) { try { localStorage.setItem('nd_' + k, JSON.stringify(v)); } catch {} }
   };
 
-  // ========== PHONETICS ==========
+  // ========== PHONETICS (with pronunciation variants) ==========
   const Ph = {
     o: ['zero','one','two','three','four','five','six','seven','eight','nine'],
+    // 英式发音变体：0 可读 "oh" 或 "zero"
+    oAlt: ['oh','one','two','three','four','five','six','seven','eight','nine'],
     t: ['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],
     d: ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'],
-    w(n) { n = +n; if (n < 10) return this.o[n]; if (n < 20) return this.t[n - 10]; const a = n / 10 | 0, b = n % 10; return b ? this.d[a] + ' ' + this.o[b] : this.d[a]; },
-    h(n) { n = +n; if (n < 100) return this.w(n); const a = n / 100 | 0, b = n % 100; return b ? this.o[a] + ' hundred ' + this.w(b) : this.o[a] + ' hundred'; },
+    
+    // 基础数字转换
+    w(n) { 
+      n = +n; 
+      if (n < 10) return this.o[n]; 
+      if (n < 20) return this.t[n - 10]; 
+      const a = n / 10 | 0, b = n % 10; 
+      return b ? this.d[a] + ' ' + this.o[b] : this.d[a]; 
+    },
+    
+    h(n) { 
+      n = +n; 
+      if (n < 100) return this.w(n); 
+      const a = n / 100 | 0, b = n % 100; 
+      return b ? this.o[a] + ' hundred ' + this.w(b) : this.o[a] + ' hundred'; 
+    },
+    
+    // ===== 电话号码 - 支持 double/triple 变体 =====
     phone(d) {
+      // 随机选择读法风格
+      const style = Math.random();
+      
+      if (style < 0.4) {
+        // 风格1: 标准逐位读（40%概率）
+        return this.phoneStandard(d);
+      } else if (style < 0.7) {
+        // 风格2: 使用 double/triple（30%概率）
+        return this.phoneGrouped(d);
+      } else {
+        // 风格3: 使用 "oh" 替代 "zero"（30%概率）
+        return this.phoneWithOh(d);
+      }
+    },
+    
+    // 标准逐位读
+    phoneStandard(d) {
       if (d.length <= 4) return d.split('').map(x => this.o[+x]).join(', ');
       if (d.length <= 7) return d.slice(0, 3).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(3).split('').map(x => this.o[+x]).join(' ');
       return d.slice(0, 3).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(3, 6).split('').map(x => this.o[+x]).join(' ') + ', ' + d.slice(6).split('').map(x => this.o[+x]).join(' ');
     },
-    price(dol, cen) { let s = this.h(dol) + ' dollar' + (dol !== 1 ? 's' : ''); if (cen > 0) s += ' and ' + this.w(cen) + ' cent' + (cen !== 1 ? 's' : ''); return s; },
+    
+    // 使用 "oh" 替代 "zero"
+    phoneWithOh(d) {
+      const arr = d.length <= 4 ? this.oAlt : this.oAlt;
+      if (d.length <= 4) return d.split('').map(x => arr[+x]).join(', ');
+      if (d.length <= 7) return d.slice(0, 3).split('').map(x => arr[+x]).join(' ') + ', ' + d.slice(3).split('').map(x => arr[+x]).join(' ');
+      return d.slice(0, 3).split('').map(x => arr[+x]).join(' ') + ', ' + d.slice(3, 6).split('').map(x => arr[+x]).join(' ') + ', ' + d.slice(6).split('').map(x => arr[+x]).join(' ');
+    },
+    
+    // 使用 double/triple 分组
+    phoneGrouped(d) {
+      const segments = [];
+      let i = 0;
+      
+      // 按3-3-4或3-4或自然分段
+      if (d.length === 10) {
+        segments.push(d.slice(0, 3), d.slice(3, 6), d.slice(6));
+      } else if (d.length === 7) {
+        segments.push(d.slice(0, 3), d.slice(3));
+      } else {
+        segments.push(d);
+      }
+      
+      return segments.map(seg => this.groupDigits(seg)).join(', ');
+    },
+    
+    // 分析连续相同数字，使用 double/triple
+    groupDigits(s) {
+      const result = [];
+      let i = 0;
+      
+      while (i < s.length) {
+        let count = 1;
+        while (i + count < s.length && s[i] === s[i + count] && count < 3) {
+          count++;
+        }
+        
+        const digit = +s[i];
+        if (count === 3) {
+          result.push('triple ' + this.o[digit]);
+        } else if (count === 2) {
+          result.push('double ' + this.o[digit]);
+        } else {
+          // 随机使用 oh 替代 zero
+          result.push(digit === 0 && Math.random() > 0.5 ? 'oh' : this.o[digit]);
+        }
+        i += count;
+      }
+      
+      return result.join(' ');
+    },
+    
+    // ===== 价格 =====
+    price(dol, cen) { 
+      let s = this.h(dol) + ' dollar' + (dol !== 1 ? 's' : ''); 
+      if (cen > 0) s += ' and ' + this.w(cen) + ' cent' + (cen !== 1 ? 's' : ''); 
+      return s; 
+    },
+    
+    // ===== 年份 - 支持多种读法 =====
     year(y) {
+      // 随机选择读法风格
+      const style = Math.random();
+      
+      if (style < 0.7) {
+        // 70% 概率：标准年份读法
+        return this.yearStandard(y);
+      } else {
+        // 30% 概率：逐位读法
+        return this.yearDigitByDigit(y);
+      }
+    },
+    
+    // 标准年份读法（如 1990 → nineteen ninety）
+    yearStandard(y) {
       if (y >= 2000 && y <= 2009) return y === 2000 ? 'two thousand' : 'two thousand ' + this.o[y - 2000];
       if (y >= 2010 && y <= 2019) return 'twenty ' + this.t[y - 2010];
       if (y >= 2020) return 'twenty ' + this.w(y % 100);
@@ -1106,14 +1372,88 @@
       if (r < 10) return this.w(c) + ' oh ' + this.o[r];
       return this.w(c) + ' ' + this.w(r);
     },
-    pct(v) { const p = String(v).split('.'); let s = this.w(+p[0]); if (p[1] && +p[1] > 0) s += ' point ' + p[1].split('').map(x => this.o[+x]).join(' '); return s + ' percent'; }
+    
+    // 逐位读法（如 1990 → one nine nine zero）
+    yearDigitByDigit(y) {
+      const s = String(y);
+      // 使用 "oh" 替代部分 "zero"
+      return s.split('').map(x => +x === 0 && Math.random() > 0.5 ? 'oh' : this.o[+x]).join(' ');
+    },
+    
+    // ===== 百分比 =====
+    pct(v) { 
+      const p = String(v).split('.'); 
+      let s = this.w(+p[0]); 
+      if (p[1] && +p[1] > 0) s += ' point ' + p[1].split('').map(x => this.o[+x]).join(' '); 
+      return s + ' percent'; 
+    }
   };
 
   // ========== FACTORY ==========
   const F = {
+    // 动态计时：根据数字位数计算合理作答时间
+    calcTime(q, level) {
+      const c = DIFF[level];
+      if (!c.time) return null;  // Level 1-2 无计时
+      
+      // 基础时间 + 每位数字额外时间
+      const digits = q.raw.replace(/[^0-9]/g, '').length;
+      const baseTime = c.time * 0.6;  // 基础时间为原设定的60%
+      const perDigit = 0.8;            // 每位数字0.8秒
+      const calculated = baseTime + (digits * perDigit);
+      
+      // 限制在合理范围内
+      return Math.min(Math.max(calculated, c.time * 0.7), c.time * 1.5);
+    },
+    
+    // 弱项加权选题 - 基于最近30题的精确滑动窗口
+    pickType() {
+      const types = ['phone', 'price', 'year', 'percent'];
+      const history = Store.get('recentHistory', []);
+      
+      // 统计最近30题各题型的错误率
+      const stats = {};
+      types.forEach(t => stats[t] = { ok: 0, total: 0 });
+      
+      history.slice(-30).forEach(h => {
+        if (stats[h.type]) {
+          stats[h.type].total++;
+          if (h.ok) stats[h.type].ok++;
+        }
+      });
+      
+      // 计算各题型的"弱项分数"（错误率越高，分数越高）
+      const weights = types.map(t => {
+        const s = stats[t];
+        if (s.total < 3) return 1;  // 样本不足时均等概率
+        const errorRate = 1 - (s.ok / s.total);
+        // 权重公式：基础1 + 错误率*3，错误率50%时权重2.5
+        return 1 + (errorRate * 3);
+      });
+      
+      // 加权随机选择
+      const totalWeight = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * totalWeight;
+      for (let i = 0; i < types.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return types[i];
+      }
+      return types[0];
+    },
+    
+    // 记录答题历史（滑动窗口）
+    recordHistory(type, ok) {
+      const history = Store.get('recentHistory', []);
+      history.push({ type, ok, ts: Date.now() });
+      // 只保留最近50条（给一些余量）
+      if (history.length > 50) history.shift();
+      Store.set('recentHistory', history);
+      S.recentHistory = history;
+    },
+    
     gen(lv, tp) {
       const c = DIFF[lv];
-      tp = tp || ['phone', 'price', 'year', 'percent'][Math.random() * 4 | 0];
+      tp = tp || this.pickType();  // 使用弱项加权选题
       let q;
       if (tp === 'phone') { let d = ''; for (let i = 0; i < c.phone; i++) d += Math.random() * 10 | 0; let disp = d; if (d.length === 7) disp = d.slice(0,3) + '-' + d.slice(3); else if (d.length === 10) disp = '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6); q = { raw: d, display: disp, spoken: Ph.phone(d) }; }
       else if (tp === 'price') { const dol = (Math.random() * (c.price[1] - c.price[0]) | 0) + c.price[0]; const cen = c.price[2] ? Math.random() * 100 | 0 : 0; const raw = cen > 0 ? dol + '.' + String(cen).padStart(2, '0') : String(dol); q = { raw, display: '$' + raw, spoken: Ph.price(dol, cen) }; }
@@ -1128,28 +1468,79 @@
 
   // ========== AUDIO ==========
   const A = {
-    syn: window.speechSynthesis, voice: null,
+    syn: window.speechSynthesis, 
+    voice: null,
+    voices: {},  // 缓存各口音的 voice
+    
     init() {
       return new Promise(r => {
-        const check = () => { const v = this.syn.getVoices(); if (v.length) { this.voice = v.find(x => x.lang === 'en-US') || v[0]; r(true); } else setTimeout(check, 100); };
-        this.syn.onvoiceschanged = check; check(); setTimeout(() => r(true), 2000);
+        const check = () => { 
+          const v = this.syn.getVoices(); 
+          if (v.length) { 
+            // 为每种口音找到最佳 voice
+            ['en-US', 'en-GB', 'en-AU'].forEach(lang => {
+              // 优先选择该语言的原生 voice
+              this.voices[lang] = v.find(x => x.lang === lang) 
+                || v.find(x => x.lang.startsWith(lang.split('-')[0])) 
+                || v[0];
+            });
+            // 设置当前 voice
+            this.voice = this.voices[S.accent] || this.voices['en-US'] || v[0];
+            r(true); 
+          } else {
+            setTimeout(check, 100);
+          }
+        };
+        this.syn.onvoiceschanged = check; 
+        check(); 
+        setTimeout(() => r(true), 2000);
       });
     },
-    unlock() { S.voiceState = 'UNLOCKING'; return this.init().then(() => this.speak('ready', 1, true)).then(ok => { S.voiceState = ok ? 'READY' : 'ERROR'; return ok; }); },
+    
+    // 切换口音
+    setAccent(accent) {
+      if (this.voices[accent]) {
+        this.voice = this.voices[accent];
+        S.accent = accent;
+        const p = Store.get('prefs', {});
+        p.accent = accent;
+        Store.set('prefs', p);
+      }
+    },
+    
+    // 获取可用口音列表
+    getAvailableAccents() {
+      return Object.keys(this.voices).filter(k => this.voices[k]);
+    },
+    
+    unlock() { 
+      S.voiceState = 'UNLOCKING'; 
+      return this.init().then(() => this.speak('ready', 1, true)).then(ok => { 
+        S.voiceState = ok ? 'READY' : 'ERROR'; 
+        return ok; 
+      }); 
+    },
+    
     speak(text, rate, silent) {
       return new Promise(r => {
         try {
           this.syn.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          u.lang = 'en-US'; u.volume = silent ? 0.01 : 1;
+          u.lang = S.accent; 
+          u.volume = silent ? 0.01 : 1;
           if (this.voice) u.voice = this.voice;
           u.rate = rate;
-          let done = false; const fin = ok => { if (!done) { done = true; r(ok); } };
-          u.onend = () => fin(true); u.onerror = () => fin(false); setTimeout(() => fin(false), 15000);
-          window.__u = u; this.syn.speak(u);
+          let done = false; 
+          const fin = ok => { if (!done) { done = true; r(ok); } };
+          u.onend = () => fin(true); 
+          u.onerror = () => fin(false); 
+          setTimeout(() => fin(false), 15000);
+          window.__u = u; 
+          this.syn.speak(u);
         } catch { r(false); }
       });
     },
+    
     play(text, rate) {
       if (S.voiceState !== 'READY' || S.speaking) return Promise.resolve(false);
       S.speaking = true; UI.render();
@@ -1189,8 +1580,16 @@
       S.mult = p.mult || 1.0;
       S.offset = p.offset || 1.0;
       S.level = p.level || 1;
+      S.accent = p.accent || 'en-US';
+      S.recentHistory = Store.get('recentHistory', []);
       this.updateLevelUI();
+      this.updateAccentUI();
       this.updateRate();
+    },
+    updateAccentUI() {
+      document.querySelectorAll('.accent-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.accent === S.accent);
+      });
     },
     updateLevelUI() {
       this.el.levelList.querySelectorAll('.level-item').forEach(item => {
@@ -1221,9 +1620,15 @@
         this.el.time.textContent = (sess.att.reduce((a, b) => a + b.t, 0) / sess.att.length / 1000).toFixed(1) + 's';
       }
       
-      // Level info
+      // Level info + Review mode indicator
       const c = DIFF[S.level];
-      this.el.qLevel.textContent = c.name;
+      let levelText = c.name;
+      if (S.reviewMode && S.reviewQueue.length > 0) {
+        levelText = c.name + ' <span class="review-badge">' + (S.reviewQueue.length + 1) + ' left</span>';
+      } else if (S.reviewMode) {
+        levelText = c.name + ' <span class="review-badge">Review</span>';
+      }
+      this.el.qLevel.innerHTML = levelText;
       
       // Main display
       if (curr) {
@@ -1286,25 +1691,50 @@
       const list = document.getElementById('mistakes-list');
       list.innerHTML = '';
       
+      // 更新 Continue 按钮文字
+      const continueBtn = document.getElementById('continue-btn');
       if (sess.mis.length) {
         document.getElementById('mistakes-section').classList.remove('hidden');
+        continueBtn.textContent = 'Practice ' + sess.mis.length + ' Wrong';
         sess.mis.slice(0, 5).forEach(m => {
           const div = document.createElement('div');
           div.className = 'mistake-item';
           div.innerHTML = '<span class="correct-answer">' + m.display + '</span><span class="user-answer">' + (m.userInput || '—') + '</span>';
           list.appendChild(div);
         });
+        if (sess.mis.length > 5) {
+          const more = document.createElement('div');
+          more.className = 'mistakes-more';
+          more.textContent = '+' + (sess.mis.length - 5) + ' more';
+          list.appendChild(more);
+        }
       } else {
         document.getElementById('mistakes-section').classList.add('hidden');
+        continueBtn.textContent = 'Continue';
+      }
+      
+      // 如果是错题重练模式，显示特殊标题
+      const title = document.querySelector('.summary-title');
+      if (S.reviewMode) {
+        title.textContent = 'Review Complete';
+      } else {
+        title.textContent = 'Session Complete';
       }
       
       this.modal('summary-modal', true);
+    },
+    
+    // 校准界面更新
+    updateCalibrationUI(data) {
+      // 如果需要更新校准界面的状态，可以在这里实现
     }
   };
 
   // ========== APP ==========
   const App = {
     timer: null,
+    calibrationData: null,  // 智能校准数据
+    
     start() {
       UI.el.start.disabled = true;
       UI.el.start.textContent = 'Loading...';
@@ -1315,7 +1745,7 @@
       A.unlock().then(ok => {
         if (ok) {
           if (!p.calibrated) {
-            UI.modal('calibration-modal', true);
+            this.startSmartCalibration();
           } else {
             this.begin();
           }
@@ -1325,16 +1755,84 @@
         }
       });
     },
-    begin() {
+    
+    // ===== 智能校准（阶梯法）=====
+    startSmartCalibration() {
+      this.calibrationData = {
+        step: 0,
+        rates: [1.0, 0.9, 0.8, 0.7],  // 测试语速
+        currentRateIndex: 0,
+        results: [],
+        questions: [
+          { spoken: 'forty five dollars and ninety nine cents', answer: '45.99' },
+          { spoken: 'the year two thousand twenty three', answer: '2023' },
+          { spoken: 'three one four, five nine two', answer: '314592' },
+          { spoken: 'seventeen point five percent', answer: '17.5' },
+          { spoken: 'eighty seven dollars', answer: '87' },
+          { spoken: 'one nine eight five', answer: '1985' },
+          { spoken: 'six four nine, two seven three, eight zero one zero', answer: '6492738010' },
+          { spoken: 'thirty two point eight percent', answer: '32.8' },
+          { spoken: 'two hundred fifteen dollars and fifty cents', answer: '215.50' },
+          { spoken: 'the year nineteen ninety six', answer: '1996' }
+        ]
+      };
+      UI.modal('calibration-modal', true);
+      UI.updateCalibrationUI(this.calibrationData);
+    },
+    
+    playCalibSample(idx) {
+      if (S.speaking) return;
+      const cd = this.calibrationData;
+      if (!cd) return;
+      const rate = cd.rates[idx];
+      A.play('The total is forty five dollars', rate);
+    },
+    
+    selectCalibSpeed(rateIndex) {
+      const cd = this.calibrationData;
+      if (!cd) return;
+      
+      // 根据选择设置 offset
+      const offsets = [1.0, 0.95, 0.9, 0.85];
+      S.offset = offsets[rateIndex];
+      
+      const p = Store.get('prefs', {});
+      p.offset = S.offset;
+      p.calibrated = true;
+      Store.set('prefs', p);
+      
+      UI.modal('calibration-modal', false);
+      this.calibrationData = null;
+      this.begin();
+    },
+    
+    begin(reviewMode = false) {
+      S.reviewMode = reviewMode;
+      
+      if (reviewMode && S.session && S.session.mis.length > 0) {
+        // 错题重练模式：将错题加入队列
+        S.reviewQueue = S.session.mis.map(q => ({
+          ...q,
+          heard: false,
+          done: false,
+          ok: null,
+          userInput: null
+        }));
+      } else {
+        S.reviewQueue = [];
+      }
+      
       S.session = { att: [], ok: 0, streak: 0, best: 0, mis: [] };
       S.current = null;
       S.input = '';
       UI.show('TRAIN');
       UI.render();
     },
+    
     rate() {
       return DIFF[S.level].baseRate * S.mult * S.offset;
     },
+    
     handleListen() {
       const curr = S.current;
       
@@ -1353,10 +1851,19 @@
       // New question
       this.listen();
     },
+    
     listen() {
       if (S.speaking || S.voiceState !== 'READY') return;
       
-      const q = F.gen(S.level);
+      let q;
+      if (S.reviewMode && S.reviewQueue.length > 0) {
+        // 从错题队列取题
+        q = S.reviewQueue.shift();
+      } else {
+        // 生成新题
+        q = F.gen(S.level);
+      }
+      
       q.heard = false;
       q.done = false;
       q.ok = null;
@@ -1368,24 +1875,37 @@
         if (ok) {
           q.heard = true;
           q.at = Date.now();
-          const c = DIFF[S.level];
-          if (c.time) this.startTimer(c.time);
+          
+          // 使用动态计时
+          const dynamicTime = F.calcTime(q, S.level);
+          if (dynamicTime) this.startTimer(dynamicTime);
         }
         UI.render();
       });
     },
+    
     replay() {
       const q = S.current;
       if (!q || q.done || S.speaking) return;
       A.play(q.spoken, this.rate());
     },
+    
     next() {
       if (!S.current || !S.current.done) return;
+      
+      // 检查错题重练模式是否完成
+      if (S.reviewMode && S.reviewQueue.length === 0 && S.session.att.length > 0) {
+        // 错题重练完成，可以选择继续或结束
+        // 这里继续出新题直到用户退出
+        S.reviewMode = false;
+      }
+      
       S.current = null;
       S.input = '';
       UI.render();
       this.listen();
     },
+    
     input(v) {
       if (S.speaking || !S.current || S.current.done) return;
       if (v === 'del') {
@@ -1397,6 +1917,7 @@
       }
       UI.render();
     },
+    
     submit() {
       const q = S.current;
       if (!q || q.done || !S.input.length) return;
@@ -1413,6 +1934,9 @@
       
       S.session.att.push({ ok, t: Date.now() - q.at, type: q.type });
       
+      // 记录到滑动窗口（弱项加权）
+      F.recordHistory(q.type, ok);
+      
       if (ok) {
         S.session.ok++;
         S.session.streak++;
@@ -1424,6 +1948,7 @@
       
       UI.render();
     },
+    
     startTimer(sec) {
       this.clearTimer();
       const b = UI.el.bar;
@@ -1437,6 +1962,7 @@
         if (S.current && !S.current.done) this.submit();
       }, sec * 1000);
     },
+    
     clearTimer() {
       if (this.timer) {
         clearTimeout(this.timer);
@@ -1445,6 +1971,7 @@
       UI.el.bar.style.transition = 'none';
       UI.el.bar.style.width = '100%';
     },
+    
     exit() {
       this.clearTimer();
       A.syn.cancel();
@@ -1454,7 +1981,7 @@
       if (sess && sess.att.length) {
         const acc = sess.ok / sess.att.length;
         const s = Store.get('sessions', []);
-        s.unshift({ acc, count: sess.att.length, level: S.level, ts: Date.now() });
+        s.unshift({ acc, count: sess.att.length, level: S.level, ts: Date.now(), reviewMode: S.reviewMode });
         if (s.length > 20) s.pop();
         Store.set('sessions', s);
         
@@ -1468,16 +1995,30 @@
         this.home();
       }
     },
+    
     closeSummary() {
       UI.modal('summary-modal', false);
       this.home();
     },
+    
+    // 练习错题
+    practiceWrong() {
+      if (S.session && S.session.mis.length > 0) {
+        UI.modal('summary-modal', false);
+        this.begin(true);  // 进入错题重练模式
+      } else {
+        UI.modal('summary-modal', false);
+        this.begin(false);  // 无错题，正常开始
+      }
+    },
+    
     home() {
       UI.show('HOME');
       UI.load();
       UI.el.start.disabled = false;
       UI.el.start.textContent = 'Begin';
     },
+    
     updateSpeed() {
       S.mult = parseFloat(UI.el.slider.value);
       const p = Store.get('prefs', {});
@@ -1485,10 +2026,12 @@
       Store.set('prefs', p);
       UI.render();
     },
+    
     preview() {
       if (S.speaking) return;
       A.play('The total is forty five dollars and ninety nine cents', this.rate());
     },
+    
     playCalib(s) {
       if (S.speaking) return;
       S.speaking = true;
@@ -1496,6 +2039,7 @@
         S.speaking = false;
       });
     },
+    
     selectCalib(c) {
       S.offset = c === 'A' ? 1.0 : 0.85;
       const p = Store.get('prefs', {});
@@ -1505,6 +2049,7 @@
       UI.modal('calibration-modal', false);
       this.begin();
     },
+    
     selectLevel(lv) {
       S.level = lv;
       const p = Store.get('prefs', {});
@@ -1541,16 +2086,25 @@
     document.getElementById('preview-btn').addEventListener('click', () => App.preview());
     document.getElementById('close-speed-modal').addEventListener('click', () => UI.modal('speed-modal', false));
     
+    // Accent selection
+    document.getElementById('accent-options').addEventListener('click', e => {
+      const btn = e.target.closest('.accent-btn');
+      if (btn && btn.dataset.accent) {
+        A.setAccent(btn.dataset.accent);
+        UI.updateAccentUI();
+      }
+    });
+    
     // Summary modal
-    document.getElementById('continue-btn').addEventListener('click', () => { UI.modal('summary-modal', false); App.begin(); });
+    document.getElementById('continue-btn').addEventListener('click', () => App.practiceWrong());
     document.getElementById('back-home-btn').addEventListener('click', () => App.closeSummary());
     
-    // Calibration modal
+    // Calibration modal - 四档语速选择
     document.getElementById('close-calib-modal').addEventListener('click', () => UI.modal('calibration-modal', false));
-    document.getElementById('sample-a-btn').addEventListener('click', () => App.playCalib('A'));
-    document.getElementById('sample-b-btn').addEventListener('click', () => App.playCalib('B'));
-    document.getElementById('select-a-btn').addEventListener('click', () => App.selectCalib('A'));
-    document.getElementById('select-b-btn').addEventListener('click', () => App.selectCalib('B'));
+    for (let i = 0; i < 4; i++) {
+      document.getElementById('sample-' + i + '-btn').addEventListener('click', () => App.playCalibSample(i));
+      document.getElementById('select-' + i + '-btn').addEventListener('click', () => App.selectCalibSpeed(i));
+    }
     
     // Keyboard
     document.addEventListener('keydown', e => {
